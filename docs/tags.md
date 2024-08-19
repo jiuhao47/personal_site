@@ -1,5 +1,4 @@
-# Tags
+# 标签索引
 
-Following is a list of relevant tags:
-
+你可以在这里通过标签进行文章索引
 <!-- material/tags -->

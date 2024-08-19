@@ -1,17 +1,5 @@
-site_name: Test
+site_name: SYSTEM CENTER SPACE
 
-nav:
-  - Home: index.md
-  - About: 
-    - about:
-      - about.md
-  - Section:
-    - section/index.md 
-    - Page 1: section/page-1.md
-    - Page n: section/page-n.md
-    - tag: tags.md
-  - Blog:
-    - blog/index.md
     
 theme:
   name: material
@@ -69,8 +57,17 @@ theme:
     - search.share
     - content.action.edit
     - content.action.view
+    - content.code.annotate
 plugins:
-  - search
+  - search:
+      lang: 
+        - zh
+        - en
+      seperator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+      pipeline:
+        - stemmer
+        - stopWordFilter
+        - trimmer
   - blog
   - tags:
       tags_file: tags.md
@@ -88,8 +85,48 @@ repo_name: jiuhao47/personal_site
 copyright: Copyright &copy; 2024 Jiuhao
 edit_uri: edit/main/docs/
 
-extra_css:
-  - stylesheets/extra.css
+
+markdown_extensions:
+
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+    #emoji_index: !!python/name:material.extensions.emoji.twemoji 
+    #emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      use_pygments: true
+      auto_title: true
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.critic:
+      mode: view
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
 extra:
   tags:
     tag1: tag_identifier
@@ -100,4 +137,8 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/jiuhao47
       name: My Github Profile
-
+extra_css:
+  - stylesheets/extra.css
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
