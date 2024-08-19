@@ -3,11 +3,12 @@ search:
   exclude: true
   boost: 2
 hide:
-  - navigation
-  - toc
-  - tags
+  #- navigation
+  #- toc
+  #- tags
 tags:
   - CSS
+comments: true
 ---
 
 
