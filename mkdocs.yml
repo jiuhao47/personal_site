@@ -2,8 +2,17 @@ site_name: Test
 
 nav:
   - Home: index.md
-  - About: about.md
-
+  - About: 
+    - about:
+      - about.md
+  - Section:
+    - section/index.md 
+    - Page 1: section/page-1.md
+    - Page n: section/page-n.md
+    - tag: tags.md
+  - Blog:
+    - blog/index.md
+    
 theme:
   name: material
   palette:
@@ -31,6 +40,63 @@ theme:
     code: Hack Nerd Font
   icon:
     logo: material/web-cancel
+    edit: material/file-edit
+    view: material/file-eye
+    tag:
+      tag_identifier: material/tag
+      html: fontawesome/brands/html5
+      js: fontawesome/brands/js
+      css:  fontawesome/brands/css3
+      
   favicon: assets/icons8-no-internet-96.png
+  features:
+    - navigation.instant
+    # - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    # - navigation.expand
+    - navigation.indexs
+    - navigation.top
+    - navigation.footer
+    - toc.follow 
+    # - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.action.edit
+    - content.action.view
+plugins:
+  - search
+  - blog
+  - tags:
+      tags_file: tags.md
+
+  #- rss:
+  #   match_path: blog/posts/.* 
+  #    date_from_meta:
+  #     as_creation: date
+  #   categories:
+  #     - categories
+  #     - tags
+
+repo_url: https://github.com/jiuhao47/personal_site
+repo_name: jiuhao47/personal_site
+copyright: Copyright &copy; 2024 Jiuhao
+edit_uri: edit/main/docs/
+
 extra_css:
   - stylesheets/extra.css
+extra:
+  tags:
+    tag1: tag_identifier
+    HTML5: html
+    JavaScript: js
+    CSS: css
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/jiuhao47
+      name: My Github Profile
+
