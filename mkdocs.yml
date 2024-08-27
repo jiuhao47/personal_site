@@ -1,6 +1,24 @@
 site_name: SYSTEM CENTER SPACE
 
-    
+nav:
+  - Home: index.md
+  - Blog: 
+      - blog/index.md
+  - Tags: tags.md
+  - OS:
+    - Index:
+        - os/index.md
+        - Chapter 1: os/Chapter-1.md
+        - Chapter 2: os/Chapter-2.md
+        - Chapter 3: os/Chapter-3.md
+        - Chapter 4: os/Chapter-4.md
+        - Chapter 5: os/Chapter-5.md
+        - Chapter 6: os/Chapter-6.md
+        - Chapter 7: os/Chapter-7.md
+        - Chapter 8: os/Chapter-8.md
+        - Chapter 9: os/Chapter-9.md
+
+
 theme:
   name: material
   custom_dir: overrides
