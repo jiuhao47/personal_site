@@ -17,6 +17,10 @@ nav:
         - Chapter 7: os/Chapter-7.md
         - Chapter 8: os/Chapter-8.md
         - Chapter 9: os/Chapter-9.md
+  - CTF:
+    - Index:
+        - ctf/index.md
+        - Env_Setup: ctf/env.md
 
 
 theme:
