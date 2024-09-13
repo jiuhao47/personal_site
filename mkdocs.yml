@@ -20,8 +20,6 @@ nav:
   - CTF:
     - Index:
         - ctf/index.md
-        - Env_Setup: ctf/env.md
-        - C_Basics: ctf/c_s0.md
 
 
 theme:

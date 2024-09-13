@@ -1,6 +1,6 @@
 # 介绍
 
-这里是UCAS_CTF培训的首页，这里会有部分讲义上传。
+内容已迁移至[UCAS-CTF Wiki](https://ucas-ctf.github.io/)。
 
 以下为GPT发癫
 
