@@ -1,11 +1,11 @@
 ---
-draft: true
-date: 2024-09-16
+draft: false
+date: 2024-09-17
 authors:
   - Jiuhao 
 categories: 
   - Fuzz
-  - Tool Tutorial
+  - Source Code Reading
 tags:
   - Fuzz
   - IIE
@@ -523,5 +523,53 @@ extern bool RunningUserCallback;
 - [FuzzerCommand.h](#fuzzercommandh)：定义了一些命令行参数相关的函数。
 - [FuzzerDefs.h](#fuzzerdefsh)：定义了一些常量和数据结构。
 
+**函数定义**：
 
+- `PrintHexArray`和`PrintASCII`：用于打印十六进制数组和ASCII字符。
+- `ToASCII`和`IsASCII`：用于检查和转换数据为ASCII格式。
+- `Base64`：将数据编码为Base64格式。
+- `PrintPC`和`DescribePC`：用于打印程序计数器信息。
+- `ExecuteCommand`：执行命令并可获取输出。
+- `CloneArgsWithoutX`：克隆参数，排除特定值。
+- `SimpleFastHash`：计算数据的快速哈希值。
 
+```cpp
+inline uint8_t *RoundUpByPage(uint8_t *P) {
+  uintptr_t X = reinterpret_cast<uintptr_t>(P);
+  size_t Mask = PageSize() - 1;
+  X = (X + Mask) & ~Mask;
+  return reinterpret_cast<uint8_t *>(X);
+}
+inline uint8_t *RoundDownByPage(uint8_t *P) {
+  uintptr_t X = reinterpret_cast<uintptr_t>(P);
+  size_t Mask = PageSize() - 1;
+  X = X & ~Mask;
+  return reinterpret_cast<uint8_t *>(X);
+}
+```
+
+**内存管理**：
+
+提供了与内存相关的函数，如`RoundUpByPage`和`RoundDownByPage`，用于按页面大小对齐指针。
+
+**平台特定功能**
+
+- `SetSignalHandler`：设置信号处理程序，处理模糊测试中的特定信号。
+- `SleepSeconds`：使线程暂停指定的秒数。
+- `GetPid`：获取当前进程的ID。
+- `GetPeakRSSMb`：获取当前进程的峰值常驻集大小（RSS）。
+- `ExecuteCommand`：执行命令并可获取输出。
+- `OpenProcessPipe`：打开进程管道以执行命令。
+- `CloseProcessPipe`：关闭打开的进程管道。
+
+```cpp
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+template <typename T> T HostToLE(T X) { return X; }
+#else
+template <typename T> T HostToLE(T X) { return Bswap(X); }
+#endif
+```
+
+**字节序转换**：
+
+根据字节序定义了`HostToLE`模板函数。
