@@ -140,6 +140,199 @@ tags:
 
 > *Missing Intermediate State*: Unlike the previous two cases, there might be neither variables that contain the state, nor code that mutates the state that we care about. In such situations, an analyst can create artificial intermediate states to guide the fuzzer.
 
+#### Approaches to State Exploration
+
+
+> Known Relevant State Values: As described before, sometimes the code coverage yields nearly no information about the state of the program, because all the interesting state is stored in data. For example, the coverage tells very little about the behavior of a branch-free AES implementation. If the analyst has an understanding of the variables that store the interesting state, he can directly expose the state to the fuzzer and the fuzzer is then able to explore inputs that cause different internal states.
+
+- 已知相关状态值：如前所述，有时代码覆盖几乎不提供关于程序状态的信息，因为所有有趣的状态都存储在数据中。例如，覆盖几乎不提供关于无分支AES实现行为的信息。如果分析师了解存储有趣状态的变量，他可以直接将状态暴露给fuzzer，然后fuzzer就能够探索导致不同内部状态的输入。
+
+```c
+while (true) {
+  ox = x;
+  oy = y;
+  switch (input[i]) {
+  case 'w':
+    y--;
+    break;
+  case 's':
+    y++;
+    break;
+  case 'a':
+    x--;
+    break;
+  case 'd':
+    x++;
+    break;
+  }
+  if (maze[y][x] == '#') {
+    Bug();
+  }
+  // If target is blocked, do not advance
+  if (maze[y][x] != ' ') {
+    x = ox;
+    y = oy;
+  }
+}
+```
+
+> Consider the code. It implements a small game, in which the player has to navigate a labyrinth by moving in one of four possible directions. It is based on the famous labyrinth demo that is commonly used by the symbolic execution community to demonstrate how a symbolic executor can explore the state space of a maze. In this modified version, it is possible to walk backward and to stay in the same place. This creates a vast amount of different paths through the program. At the same time, there are effectively only four branches that can be covered, thus the coverage alone is not a good indicator of interesting behavior. In this harder version, even KLEE fails to solve the labyrinth. Here, it is essential to understand that the x and y coordinates are relevant states that need to be explored. In mazes with dead ends, it is even impossible to find a solution by trying to increase x or y individually. The combination of both x and y has to be considered to uncover a solution. Since the maze is rather small (at most only a few hundred different x, y pairs are reachable), the analyst can instruct the fuzzer to consider any new pair as new coverage.
+
+- 考虑代码。它实现了一个小游戏，玩家必须通过在四个可能的方向中移动来导航迷宫。它基于著名的迷宫演示，通常被符号执行社区用来演示符号执行器如何探索迷宫的状态空间。在这个修改后的版本中，可以向后走，也可以停留在原地。这通过程序创建了大量不同的路径。同时，**实际上只有四个分支可以被覆盖，因此仅仅覆盖不是有趣行为的好指标**。在这个更难的版本中，即使是KLEE也无法解决迷宫。在这里，重要的是要理解x和y坐标是需要探索的相关状态。在有死胡同的迷宫中，通过尝试单独增加x或y是不可能找到解决方案的。必须考虑x和y的组合才能找到解决方案。**由于迷宫相当小（最多只有几百个不同的x，y对是可达的），分析师可以指示fuzzer将任何新对视为新覆盖**。
+
+> Known State Changes: In some scenarios, the user might not be aware of which parts of the relevant state are interesting to explore or the state might be spread out across the application and hard to identify. Alternatively, the state might be known, but no sufficiently small subset can be identified to be used to guide the fuzzer directly. However, it might be possible to identify parts of the code that are expected to change the state. This situation commonly occurs in applications that consume highly structured data such as sequences of messages or lists of chunks in file formats. In such situations, instead of directly exposing the state itself, the user can create a variable that contains a log of messages or chunk types. This variable can act as a proxy for the actual state changes and can be exposed to the feedback function (Figure 2.b). As a consequence, the fuzzer can now try to explore different combinations of those state changes. In such scenarios, the state change log serves as an abstraction layer to the real state that cannot easily be exposed to the fuzzer. We further elaborate on this in Example 4 of Section III-D.
+
+- 已知状态变化：在某些情况下，用户可能不知道哪些相关状态的部分是有趣的探索，或者状态可能分散在整个应用程序中，很难识别。或者，状态可能是已知的，但无法识别足够小的子集来直接指导fuzzer。但是，可能可以识别预计会改变状态的代码部分。这种情况通常发生在消耗高度结构化数据的应用程序中，例如消息序列或文件格式中的块列表。 **在这种情况下，用户可以创建一个包含消息或块类型日志的变量。这个变量可以作为实际状态变化的代理，并暴露给反馈函数。因此，fuzzer现在可以尝试探索这些状态变化的不同组合** 。在这种情况下，状态变化日志充当了一个抽象层，用于无法轻松暴露给fuzzer的真实状态。
+
+```c
+msg = parse_msg();
+switch (msg.type) {
+case Hello:
+  eval_hello(msg);
+  break;
+case Login:
+  eval_login(msg);
+  break;
+case Msg_A:
+  eval_msg_a(msg);
+  break;
+}
+```
+
+> Consider the dispatcher code shown in Listing 2, which is based on many common protocol implementations. The fuzzer will successfully uncover the different messages. However, AFL has difficulties to generate interesting sequences of messages, as no novel coverage is produced for chaining messages. The fundamental problem here is that the fuzzer is not able to distinguish between different states in the program state machine. By using a log of the types of messages that were successfully processed, the fuzzer is able to explore different states, resulting from combinations of messages, much more effectively.
+
+- 考虑代码中显示的调度程序代码，它基于许多常见的协议实现。fuzzer将成功地发现不同的消息。然而，AFL难以生成有趣的消息序列，因为没有为链接消息生成新的覆盖。这里的根本问题是fuzzer无法区分程序状态机中的不同状态。通过使用成功处理的消息类型的日志，fuzzer能够更有效地探索由消息组合产生的不同状态。
+
+<!--TODO: What's The problem Here -->
+
+> Missing Intermediate State: A simple example for issues where neither coverage nor values in the program provide relevant feedback are magic byte checks. Out of the box, AFLstyle fuzzers will not be able to solve them. Note that various approaches try to solve this case using additional methods. However, the same problem persists in more complex cases: if the relationship between the input and the final comparison gets more complex, even techniques like concolic execution will fail. A human analyst on the other hand, can usually reason about how the program behaves and can often provide an indicator of progress. By encoding this indicator as additional artificial intermediate states, the analyst is able to guide the fuzzer. Note that for simple magic bytes like situations, this is exactly what LAF-INTEL does.
+
+- 缺失中间状态：既不涉及覆盖率也不涉及值的反馈的问题的一个简单例子是魔术字节检查。在开箱即用的情况下，AFL风格的fuzzer将无法解决这个问题。请注意，各种方法尝试使用其他方法解决这个问题。然而，在更复杂的情况下，同样的问题仍然存在：如果输入和最终比较之间的关系变得更加复杂，即使是共享执行这样的技术也会失败。另一方面，人类分析师通常可以推理程序的行为，并经常提供进展的指示。通过将这个指示符编码为额外的人工中间状态，分析师能够指导fuzzer。请注意，对于简单的魔术字节情况，这正是LAF-INTEL所做的。
+
+```c
+// shortened version of a hashmap lookup from binutils
+entry *bfd_get_section_by_name(table *tbl, char *str) {
+  entry *lp;
+  uint32_t hash = bfd_hash_hash(str);
+  uint32_t i = hash % tbl->size;
+  // Every hash bucket contains a linked list of strings
+  for (lp = tbl->table[i]; lp != NULL; lp = lp->next) {
+    if (lp->hash == hash && strcmp(lp->string, str) == 0)
+      return lp;
+  }
+  return NULL;
+}
+// used somewhere else
+section = bfd_get_section_by_name(abfd, ".bootloader");
+if (section != NULL) {
+  ...
+}
+```
+
+> Consider the code in Listing 3, which is based on a hard case found in the well-known objdump binary. The program contains a function that performs a hash table lookup and one if condition where the lookup result is used to search for a given string. More specifically, the key is first hashed, and the corresponding bucket is checked. If the bucket is empty, no further processing takes place. If the bucket contains some values, they are compared individually. This poses a significant challenge both to a concolic execution based tools as well as fuzzers: solving this constraint requires to find a very specific combination of both a path (i.e., number of loop iterations necessary to calculate the hash) and the hash value that all share the same coverage. Even if the exact path is found, we now still depend on both the hash and the actual string matching. The fuzzer has to solve the comparison while maintaining that the hash of the input is always equal to the hash of the target string. A concolic executor would have great trouble finding the exact path to solve this constraint.
+
+- 考虑代码，它基于著名的objdump二进制文件中的一个难题。程序包含一个执行哈希表查找的函数和一个if条件，其中查找结果用于搜索给定的字符串。更具体地说，首先对密钥进行哈希处理，然后检查相应的桶。如果桶为空，则不进行进一步处理。如果桶包含一些值，则逐个进行比较。这对基于共享执行的工具和fuzzer都构成了重大挑战：解决这个约束需要找到一个非常特定的组合，即路径（即，计算哈希所需的循环迭代次数）和所有共享相同覆盖的哈希值。即使找到了确切的路径，我们现在仍然依赖于哈希和实际字符串匹配。fuzzer必须在保持输入的哈希始终等于目标字符串的哈希的情况下解决比较。共享执行器将很难找到解决这个约束的确切路径。
+
+> We found that similar conditions occur more than 500 times with various strings throughout the binutils code base. In most cases, the hash table is filled with values from the input, and a fixed string is looked up. A human can recognize that this effectively implements a one-to-many string comparison. Using this insight, she can guide the fuzzer to find a solution, by turning this complex constraint into a series of simple string comparisons that can be solved with LAF-INTEL-like feedback.
+
+- 我们发现类似的条件在整个binutils代码库中多达500多次，使用各种字符串。在大多数情况下，哈希表填充了来自输入的值，并查找了一个固定的字符串。人类可以认识到，这实际上实现了一对多的字符串比较。利用这一见解，她可以指导fuzzer找到解决方案，将这个复杂的约束转化为一系列简单的字符串比较，可以使用类似LAF-INTEL的反馈来解决。
+
+### Feedback Mechanisms
+
+> As no current fuzzer allows a human analyst to directly provide feedback to the fuzzer, we design a set of annotations that allow the analyst to influence the fuzzer’s feedback function. Our goal is that an analyst can use these annotations to provide high-level steering for the fuzzing process. In an interactive fuzzing session, the analyst inspects the code coverage from time to time to identify branches that seem hard to cover for the fuzzer. Then the analyst can identify the reason why the fuzzer is unable to make progress. Typically, this is an easy task for a human. When the road block is found, the analyst can start a second fuzzing session that focuses on solving this road block using a custom annotation. The annotation itself is a small patch to the target application, typically consisting of one, sometimes two lines of code that provide additional feedback information. When the fuzzer solves the road block, the long-running fuzzing session picks the inputs that produce new coverage from the temporary session and continues fuzzing, hence overcoming the hard case.
+
+- 由于没有当前的fuzzer允许人类分析师直接向fuzzer提供反馈，我们设计了一组注释，允许分析师影响fuzzer的反馈函数。我们的目标是，分析师可以使用这些注释为fuzzing过程提供高级别的引导。在交互式fuzzing会话中，分析师不时检查代码覆盖率，以识别对fuzzer来说似乎很难覆盖的分支。然后，分析师可以确定fuzzer无法取得进展的原因。通常，这对人类来说是一项容易的任务。当找到路障时，分析师可以启动第二个fuzzing会话，重点解决这个路障，使用自定义注释。注释本身是对目标应用程序的一个小补丁，通常包含一行，有时包含两行代码，提供额外的反馈信息。当fuzzer解决了路障时，长时间运行的fuzzing会话从临时会话中选择产生新覆盖的输入，并继续fuzzing，从而克服困难情况。
+
+> To facilitate a workflow like this, we designed four general primitives that can be used to annotate source code:
+
+> 1) We allow the analyst to select which code regions are relevant to solve the problem at hand.
+
+> 2) We allow direct access to the AFL bitmap to store additional values. Bitmap entries can either be directly set or incremented, hence enabling to expose state values to the feedback function.
+
+> 3) We enable the analyst to influence the coverage calculation. This allows the same edge coverage to result in different bitmap coverage. This allows to create much more fine-grained feedback in different states.
+
+> 4) We introduce a primitive that allows the user to add hill climbing optimization [48]. This way, the user can provide a goal to work towards if the space of possible states is too large to explore exhaustively. 
+
+
+- 为了促进这样的工作流程，我们设计了四个通用原语，可以用于注释源代码：
+    - 我们允许分析师选择哪些代码区域与解决手头问题相关。
+    - 我们允许直接访问AFL位图以存储附加值。位图条目可以直接设置或递增，从而使状态值暴露给反馈函数。
+    - 我们使分析师能够影响覆盖率计算。这允许相同的边覆盖产生不同的位图覆盖。这允许在不同状态下创建更细粒度的反馈。
+    - 我们引入了一个允许用户添加爬坡优化的原语。这样，如果可能状态空间太大而无法详尽探索，用户可以提供一个工作目标。
+
+### Annotations
+
+- IJON-Enable: 
+
+    > The IJON-ENABLE (and IJON-DISABLE) annotation can be used to enable and disable coverage feedback. This way, we can effectively exclude certain parts of the code base or guide the fuzzer to only explore code if certain conditions are met.
+
+    - IJON-ENABLE（和IJON-DISABLE）注释可用于启用和禁用覆盖反馈。这样，我们可以有效地排除代码库的某些部分，或者指导fuzzer只在满足某些条件时探索代码。
+
+- IJON-INC and IJON-SET
+
+    > The IJON-INC and IJON-SET annotations can be used to increment or set a specific entry in the bitmap. This effectively allows new values in the state to be considered as equal to new code coverage. The analyst can use this annotation to expose aspects of the state to the fuzzer selectively. As a result, the fuzzer can then explore many different values of this variable. Effectively, this annotation adds a feedback mechanism beyond code coverage. The fuzzer is now also rewarded for new data coverage obtained via its test cases. This annotation can be used to provide feedback in all three scenarios that we described earlier.
+    
+    - IJON-INC和IJON-SET注释可用于递增或设置位图中的特定条目。这实际上允许将状态中的新值视为新的代码覆盖。分析师可以使用此注释有选择地将状态的方面暴露给fuzzer。结果，fuzzer现在可以探索这个变量的许多不同值。实际上，这个注释添加了一个超出代码覆盖的反馈机制。现在，fuzzer还将通过其测试用例获得的新数据覆盖奖励。此注释可用于提供我们早期描述的所有三种情况的反馈。 
+
+
+    > As another example, consider Listing 7. After each successfully parsed and handled message, we append the command index, which represents the type of the message, to the state change log. Then we set a single bit, addressed by the hash of the state change log. As a consequence, whenever we see a new combination of up to four successfully handled messages, the fuzzer considers the input as interesting, providing a much better coverage in the state space of the application.
+    
+    - 例如，考虑代码。在每次成功解析和处理消息后，我们将命令索引（表示消息类型）附加到状态更改日志中。然后我们设置一个位，由状态更改日志的哈希地址。因此，每当我们看到最多四个成功处理的消息的新组合时，fuzzer将认为输入是有趣的，在应用程序的状态空间中提供更好的覆盖。
+
+<!-- TODO: Why Four?-->
+
+- IJON-STATE
+
+    > If the messages cannot easily be concatenated (e.g., because there is a message counter), the state change log might be insufficient to explore different states. To produce a more finegrained feedback, we can explore the Cartesian product of the state and the code coverage. To enable this, we provide a third primitive that is able to change the computation of the edge coverage itself. Similar to ANGORA, we extended the edge tuple with a third component named the “virtual state”. This virtual state component is also considered when calculating the bitmap index of any edge. This annotation is called IJON-STATE. Whenever the virtual state changes, any edge triggers new coverage. This primitive has to be used carefully: if the number of virtual states grows too large, the fuzzer is overwhelmed with a large number of inputs which effectively slows down the fuzzing progress.
+
+    - 如果消息不能轻松连接（例如，因为有一个消息计数器），状态更改日志可能不足以探索不同的状态。为了产生更细粒度的反馈，我们可以探索状态和代码覆盖的笛卡尔积。为了实现这一点，我们提供了一个能够改变边覆盖计算本身的第三个原语。类似于ANGORA，我们扩展了边元组，增加了一个名为“虚拟状态”的第三个组件。在计算任何边的位图索引时，也考虑这个虚拟状态组件。这个注释称为IJON-STATE。每当虚拟状态发生变化时，任何边都会触发新的覆盖。这个原语必须小心使用：如果虚拟状态的数量增长得太大，fuzzer将被大量输入所淹没，这实际上会减慢fuzzing的进度。
+
+- IJON-MAX
+
+    > So far, we mostly dealt with providing feedback that can be used to increase the diversity of the inputs stored. In some cases, however, we want to optimize towards a specific goal or the state space is simply too large to cover completely. In such cases, we might not care about a diverse set of values or want to discard all intermediate values. To allow effective fuzzing in such cases, we provide a maximization primitive called IJON-MAX. It effectively turns the fuzzer into a generic hill climbing-based black box optimizer. To enable maximizing more than one value, multiple (by default 512) slots are provided to store those values. Like the coverage bitmap, each value is maximized independently. Using this primitive, it is also possible to easily build a minimization primitive for x, by maximizing −x.
+
+    - 到目前为止，我们主要处理提供反馈，可以用来增加存储的输入的多样性。然而，在某些情况下，我们想要优化到一个特定的目标，或者状态空间太大，无法完全覆盖。在这种情况下，我们可能不关心多样化的值，或者想要丢弃所有中间值。为了在这种情况下实现有效的fuzzing，我们提供了一个称为IJON-MAX的最大化原语。它有效地将fuzzer转变为一个基于黑盒优化器的通用爬坡算法。为了使多个值最大化，提供了多个（默认为512）插槽来存储这些值。像覆盖位图一样，每个值都是独立最大化的。使用这个原语，还可以轻松地构建一个x的最小化原语，通过最大化-x。
+    
+    > Consider the video game Super Mario Bros., in which a player controls a character in a side-scrolling game. In each level, the objective is to reach the end of the level, while avoiding hazards such as enemies, traps, and pits. In case the character is touched by an enemy or falls into a pit, the game ends. To properly explore the state space of the game, it is important to reach the end of each level. As illustrated in Listing 9, we can finish the level by asking the fuzzer to try to maximize the player’s x coordinate. Given that it is a side-scrolling game, this effectively guides the fuzzer to find a way through the level to successfully finish it
+
+    - 考虑视频游戏超级马里奥兄弟，其中玩家控制一个角色在一个横向滚动的游戏中。在每个级别中，目标是到达级别的末尾，同时避开敌人、陷阱和坑洞等危险。如果角色被敌人碰到或掉进坑里，游戏就会结束。为了正确探索游戏的状态空间，重要的是到达每个级别的末尾。如代码所示，我们可以通过要求fuzzer尝试最大化玩家的x坐标来完成级别。鉴于这是一个横向滚动的游戏，这实际上引导fuzzer找到一种通过级别的方法，成功完成它。
+
+## IJON 的实现
+
+## IJON 的评估
+
+## 相关工作
+
+> After AFL was published about five years ago, its inner workings were analyzed in detail and multiple improvements were proposed. Different scheduling algorithms were proposed to improve fuzzing in various scenarios [10], [11], [13], [46], [56]. The second component of AFL is the input mutation strategy. Again, various improvements were proposed to increase the probability of generating interesting inputs by means of using more information on the target [6], [7], [9], [27], [40], [44] or taint tracking to limit the amount of input data that needs to be mutated [14], [45]. Lastly, AFL observes the programs behavior for each test case and receives feedback on its behavior. Different fully automated techniques were proposed that help improving the performance of this feedback generation [19], [50] or to extend the feedback [1], [29], [32]. To overcome various roadblocks, such as magic bytes, techniques based on concolic execution [20]–[22], [26], [37], [53], [55], [60], [63] and—less commonly—on symbolic execution [16], [38] were proposed. Since fuzzing is very performance-critical, various aspects of it were optimized by other projects. For example, Xu et al. improved the performance of spawning subprocesses [58]. Various fuzzers used Intel-PT to increase the performance of coverage tracing on binary targets [5], [50]. Lastly, to make fuzzing more applicable it was adopted to targets ranging from firmware [16], [64] over hypervisors [28] and operating systems [4], [50], [54] to neural networks [42], [57]
+
+
+- 在大约五年前发布AFL之后，其内部工作原理被详细分析，并提出了多种改进。提出了不同的调度算法，以改进各种场景下的fuzzing。AFL的第二个组件是输入变异策略。同样，提出了各种改进，通过使用更多关于目标的信息或污点跟踪来限制需要变异的输入数据量，以增加生成有趣输入的概率。最后，AFL观察每个测试用例的程序行为，并接收有关其行为的反馈。提出了不同的完全自动化技术，有助于改进这种反馈生成的性能，或者扩展反馈。为了克服各种障碍，例如魔术字节，提出了基于共享执行和符号执行的技术。由于fuzzing非常关键，其他项目优化了它的各个方面。例如，Xu等人改进了生成子进程的性能。各种fuzzer使用Intel-PT来提高二进制目标的覆盖跟踪性能。最后，为了使fuzzing更具适用性，它被应用于从固件到超级用户到操作系统到神经网络的各种目标。
+
+> Recently, human-in-the-loop fuzzing gained the attention of the research community. Current approaches commonly provide an interactive environment where the humans interactions are used as seeds by the fuzzer. In some scenarios this is very helpful, while in other common fuzzing scenarios, it is very hard to apply. For example, Shoshitaishvili et al. [52] introduced HACRS, a system that allows humans to interact with the target application via an emulated terminal. To help the human, HACRS analyzes the target and provides a list of strings that might be relevant to the application’s behavior. If the target provides a text-based interface, a human is often able to figure out how to interact with the target application. However, HACRS does not work when the target application does not consume data in a format easily understood by humans, e.g., binary formats, or the program output does not contain helpful information on the expected input format. Consequently, the authors excluded any program containing binary characters in the provided example scenarios from their evaluation. Similarly, DYNODROID [36] traces a human’s interaction with Android applications. In contrast to HACRS, this includes a more diverse set of input interfaces such as system events and swipe gestures. However, the fundamental principle remains the same. In contrast, our approach is based on annotating the code of the target application and does not require to understand the input format.
+
+- 最近，人机协同fuzzing引起了研究界的关注。当前的方法通常提供一个交互式环境，其中人类的交互被fuzzer用作种子。在某些情况下，这是非常有帮助的，而在其他常见的fuzzing场景中，这是非常难以应用的。例如，Shoshitaishvili等人引入了HACRS，这是一个允许人类通过模拟终端与目标应用程序交互的系统。为了帮助人类，HACRS分析目标并提供可能与应用程序行为相关的字符串列表。如果目标提供基于文本的接口，人类通常能够弄清楚如何与目标应用程序交互。然而，当目标应用程序不以人类容易理解的格式消耗数据时，例如，二进制格式，或者程序输出不包含有关预期输入格式的有用信息时，HACRS无法工作。因此，作者在评估中排除了提供示例场景中包含二进制字符的任何程序。类似地，DYNODROID跟踪人类与Android应用程序的交互。与HACRS相比，这包括更多样化的输入接口，如系统事件和滑动手势。然而，基本原则保持不变。相比之下，我们的方法是基于对目标应用程序的代码进行注释的，不需要理解输入格式。
+
+> Our approach requires little understanding of software security or program analysis. Even complex games can typically be won by untrained users. On the other hand, when fuzzing binary file formats or network protocols, even an expert user will have a hard time to come up with novel inputs based on observing only the program output. IJON allows to guide the fuzzer’s intrinsic ability to generate inputs to overcome fuzzing roadblocks and to explore a more diverse part of the state space. This approach requires no knowledge or understanding of the input format at all. In fact, we also typically had very limited understanding of the target application, as our annotations allow to provide guidance without deep understanding of the program context. For example, consider the bug shown in Listing 12. The annotation was added without any context or understanding of how kolyblk.XMLLength is calculated from the input. Still, IJON was able to trigger the integer overflow after a few minutes of analysis time.
+
+- 我们的方法几乎不需要对软件安全或程序分析有所了解。即使是未经训练的用户通常也可以赢得复杂的游戏。另一方面，当对二进制文件格式或网络协议进行fuzzing时，即使是专家用户也很难根据仅观察程序输出来提出新的输入。IJON允许引导fuzzer生成输入以克服fuzzing障碍，并探索状态空间的更多多样化部分。这种方法根本不需要对输入格式有任何了解或理解。事实上，我们通常对目标应用程序的了解非常有限，因为我们的注释允许在没有对程序上下文的深入了解的情况下提供指导。例如，考虑代码中显示的错误。注释是在没有任何上下文或对kolyblk.XMLLength如何从输入计算的理解的情况下添加的。尽管如此，IJON能够在几分钟的分析时间后触发整数溢出。
+
+## 讨论与未来工作
+
+> In this paper we describe an interactive approach to fuzzing. While this offers new ways to steer the fuzzing process, it requires manual inspection of the test coverage, acquiring an understanding of why a constraint is hard to solve, and manually creating a well-suited annotation. This manual effort comes with a certain cost to the analyst, but our evaluation demonstrates that this approach can overcome several obstacles for current fuzzers. For example, it is clear that neither a grammar nor a dictionary will help a fuzzer to solve Super Mario levels. Additionally, it is not straightforward to find good seed inputs. While in such a case, a record and replay mechanism such as a version of HACRS or DYNODROID applicable to this target might be helpful, in many other cases
+such as binary formats, it would likely not. 
+
+- 在本文中，我们描述了一种交互式fuzzing方法。虽然这提供了引导fuzzing过程的新方法，但它需要 **手动检查测试覆盖率** ，了解为什么约束难以解决，并手动创建一个合适的注释。这种手动工作对分析师来说是有一定成本的，但我们的评估表明，这种方法可以克服当前fuzzer的几个障碍。例如，很明显，语法和字典都无法帮助fuzzer解决超级马里奥的关卡。此外，要找到好的种子输入也不是一件简单的事。在这种情况下，记录和重放机制，如HACRS或DYNODROID的一个版本适用于这个目标，可能会有所帮助，但在许多其他情况下，例如二进制格式，可能不会。
+
+> The annotations used in IJON are currently added manually. It would be interesting to design methods that automatically infer annotations only for difficult individual constraints. Some existing fuzzing approaches use a subset of the annotations described by us. For example, LAF-INTEL can be represented by annotating the number of equal bytes in a comparison. Similarly, ANGORA already implements call stack based virtual state for all coverage. However, all those tools use additional feedback indiscriminately. Therefore, they are limited to low information gain feedback mechanisms. Using more precise feedback in a similar manner would result in a much larger queue and decreased performance. Automated techniques to identify IJON annotations could make use of much more powerful annotations than LAF-INTEL and ANGORA, as they are applied sparsely. Finally, right now, the annotations require source access. In principle, there is no reason why similar annotations cannot be implemented for binary-only targets. Integrating IJON with a binary-only fuzzer would be interesting 
+
+- IJON中使用的注释目前是手动添加的。设计方法自动推断只针对困难的单个约束。一些现有的fuzzing方法使用我们描述的注释的子集。例如，LAF-INTEL可以通过注释比较中相等字节的数量来表示。类似地，ANGORA已经为所有覆盖实现了基于调用堆栈的虚拟状态。然而，所有这些工具都不加区别地使用额外的反馈。因此，它们受限于低信息增益反馈机制。以类似的方式使用更精确的反馈将导致一个更大的队列和性能降低。自动识别IJON注释的技术可以利用比LAF-INTEL和ANGORA更强大的注释，因为它们应用得很少。最后，现在，注释需要源访问。原则上，没有理由为仅二进制目标实现类似的注释。将IJON与仅二进制fuzzer集成将是有趣的。
+
+## 结论
+
+> In this paper, we have shown that a large number of hard problems for fuzzers can be solved by manually inspecting the code coverage during fuzzing and using only a few lines of annotations to guide the fuzzing process. Previously, practitioners in the industry often used to manually pick seed files that solve the coverage or to design custom mutators that solve constraints (for example, by providing dictionaries or grammars). Similarly, it is well documented that practitioners try to remove hard constraints such as checksum manually. We extended this toolkit with another manual but very flexible method: annotations that an analyst can use to guide the fuzzer. By using less than four lines of code, we demonstrated how a large set of problems could be solved that no other automated fuzzing approach is currently able to handle.
+
+- 在本文中，我们展示了fuzzer的大量难题可以通过在fuzzing过程中手动检查代码覆盖率，并使用几行注释来引导fuzzing过程来解决。以前，工业界的从业者经常手动选择解决覆盖率的种子文件，或者设计自定义变异器来解决约束（例如，通过提供字典或语法）。同样，有充分的文档证明，从业者尝试手动删除硬约束，例如校验和。我们扩展了这个工具包，增加了另一种手动但非常灵活的方法：分析师可以使用注释来引导fuzzer。通过使用不到四行代码，我们演示了如何解决一系列问题，目前没有其他自动fuzzing方法能够处理。
+
 ## 概念
 
 ### Concolic Execution
@@ -147,6 +340,7 @@ tags:
 > Concolic testing (a portmanteau of concrete and symbolic, also known as dynamic symbolic execution) is a hybrid software verification technique that performs symbolic execution, a classical technique that treats program variables as symbolic variables, along a concrete execution (testing on particular inputs) path. Symbolic execution is used in conjunction with an automated theorem prover or constraint solver based on constraint logic programming to generate new concrete inputs (test cases) with the aim of maximizing code coverage. Its main focus is finding bugs in real-world software, rather than demonstrating program correctness.
 
 - 共享测试（concolic testing）是一种混合软件验证技术，它执行符号执行，这是一种将程序变量视为符号变量的经典技术，沿着具体执行（在特定输入上进行测试）路径。符号执行与基于约束逻辑编程的自动定理证明器或约束求解器结合使用，以生成新的具体输入（测试用例），目的是最大化代码覆盖率。它的主要重点是在现实世界的软件中查找错误，而不是证明程序的正确性指定版本
+
 
 ### CGC data set
 
@@ -192,6 +386,8 @@ tags:
 
 - 在每次新的测试运行之前，共享图（映射？）被清除。在测试运行期间，每次遇到一个边，共享图（映射？）中的相应字节就会增加。这意味着边计数大于255将溢出，并可能注册为0到255之间的任何数字。执行完成后，边计数被[分桶](#bucketed)，以便共享图（映射？）中具有非零边计数的每个字节都包含2的幂。为此，边计数被离散化为以下范围1、2、3、4...7、8...15、16...31、32...127、128...255。每个边计数范围都分配给一个特定的2的幂。为了增加对不常见边的精度，3也映射到一个唯一的2的幂，而32到64的范围被省略。然后，我们可以将共享图（映射？）与全局位图进行比较，全局位图包含以前运行中观察到的所有位。如果设置了任何新位，测试输入将被存储，因为它导致了覆盖率的增加，并且全局位图被更新以包含新的覆盖率。
 
+<!-- TODO: AFL统计的频率有什么用？从IJON_SET设置最低有效位图位引发的思考-->
+
 ### Extending Feedback Beyond Coverage
 
 > Fuzzers sometimes get stuck in a part of the search space, where no reasonable, probable mutation provides any new feedback.
@@ -233,6 +429,32 @@ tags:
 
 - 状态空间是程序可能处于的所有可能状态的集合。
 
+### Branch-free AES Implementations
+
+> For example, the coverage tells very little about the behavior of a branch-free AES implementation.
+
+- 例如，覆盖几乎不提供关于无分支AES实现行为的信息。
+
+"Branch-free AES implementation"是指一种避免在代码中使用条件分支（例如`if`语句）的高级加密标准（AES）算法的实现。这种方法通常用于提高性能和安全性，特别是在密码学应用中。
+
+#### 主要特点
+
+- **性能**：通过消除分支，实现可以在现代处理器上实现更好的性能，因为它减少了管道停滞的风险并提高了指令级并行性。
+
+- **安全性**：无分支实现可以缓解某些侧信道攻击，例如利用由条件分支引起的执行时间变化的定时攻击。
+
+#### 实现技术
+
+- **查找表**：使用预计算的表来替换条件逻辑。例如，实现可以使用查找表直接访问所需的值，而不是检查条件以确定要执行哪种操作。
+
+- **位操作**：利用位操作进行必要的计算，而无需分支。
+
+### ANGORA
+
+> Angora is a mutation-based coverage guided fuzzer. The main goal of Angora is to increase branch coverage by solving path constraints without symbolic execution.
+
+- Angora是一种基于变异的覆盖引导fuzzer。Angora的主要目标是通过解决路径约束而不使用符号执行来增加分支覆盖。
+
 ## 有趣的话
 
 > Computers are incredibly fast, accurate and stupid; humans are incredibly slow, inaccurate and brilliant; together they are powerful beyond imagination
@@ -242,3 +464,7 @@ tags:
 > Since even for trivially small programs, the state space is larger than the number of atoms in the universe, the fuzzer has to optimize the diversity of states reached by the test cases.
 
 - 由于即使对于微不足道的小程序，状态空间也比宇宙中的原子数量还要大，因此fuzzer必须优化测试用例达到的状态的多样性。
+
+> Glitches: Super Mario Bros. contains various wellknown glitches and secret passages, commonly exploited by speed-runners. Our fuzzer was able to find and exploit at least two of those. 
+
+- 毛刺：超级马里奥兄弟包含各种众所周知的毛刺和秘密通道，通常被速通玩家利用。我们的fuzzer能够找到并利用其中至少两个。
