@@ -37,7 +37,6 @@ tags:
 
 - 即使使用了符号执行或[共享执行](#concolic-execution)等聪明的程序分析技术，也无法轻松克服一些约束。 
 
-<!--TODO: 什么是concolic execution-->
 
 > Furthermore, in some cases, state explosion proves too much of a hindrance to current techniques—whether they are fuzzing or symbolic execution based approaches. This is due to the fact that the underlying problem (finding bugs) is undecidable in the general case. As a result, we cannot expect that any single algorithm will perform very well across all target applications that are tested.
 
@@ -85,7 +84,6 @@ tags:
 
 - 为了进一步展示我们的注释的能力，我们使用AFL结合IJON来发现新的安全问题和以前需要自定义和全面的语法才能发现的问题。
 
-<!--TODO: 什么是comprehensive grammar-->
 
 > As a result, much attention was placed on further improving fuzzing methods, often to achieve greater code coverage and reach deeper into a given software application.
 
@@ -114,8 +112,6 @@ tags:
 
 - 具体来说，我们关注一类特定的挑战：我们观察到，当前的fuzzer无法适当地探索程序的状态空间，超出了代码覆盖范围。例如，导致相同代码覆盖率但状态值不同的程序执行，无法被当前的fuzzer适当地探索。一般来说，探索状态的问题是具有挑战性的，因为很难 **自动推断哪些值是有趣的，哪些值是无趣的** 。然而，对于程序目标有高级理解的人，通常知道哪些值是相关的，哪些值是不相关的。
 
-<!--TODO: we observe that current fuzzers are not able to properly explore the state space of a program beyond code coverage ?-->
-
 > a human analyst can annotate parts of the state space that should be explored more thoroughly, hence modifying the feedback function the fuzzer can use. The required annotations are typically small, often only one or two lines of additional code are needed.
 
 - 人类分析师可以注释应该更彻底地探索的状态空间的部分，从而修改fuzzer可以使用的反馈函数。通常只需要很少的注释，通常只需要一两行额外的代码。
@@ -139,6 +135,8 @@ tags:
 - *已知状态变化*：有时，程序太复杂，或者不明显哪些变量包含有趣的状态，哪些变量不包含。在这种情况下，由于我们不知道足够小的相关状态值集，我们无法直接使用它们来指导fuzzer。相反，人类分析师可能能够识别代码中的位置，怀疑会改变状态。分析师可以使用这种状态变化的历史作为更复杂状态的抽象，并指导fuzzer。例如，许多程序逐个处理消息或输入块。处理不同类型的输入块很可能以不同的方式改变状态。
 
 > *Missing Intermediate State*: Unlike the previous two cases, there might be neither variables that contain the state, nor code that mutates the state that we care about. In such situations, an analyst can create artificial intermediate states to guide the fuzzer.
+
+- *缺失中间状态*：与前两种情况不同，既没有包含状态的变量，也没有我们关心的改变状态的代码。在这种情况下，分析师可以创建人工中间状态来指导fuzzer。
 
 #### Approaches to State Exploration
 
@@ -203,7 +201,6 @@ case Msg_A:
 
 - 考虑代码中显示的调度程序代码，它基于许多常见的协议实现。fuzzer将成功地发现不同的消息。然而，AFL难以生成有趣的消息序列，因为没有为链接消息生成新的覆盖。这里的根本问题是fuzzer无法区分程序状态机中的不同状态。通过使用成功处理的消息类型的日志，fuzzer能够更有效地探索由消息组合产生的不同状态。
 
-<!--TODO: What's The problem Here -->
 
 > Missing Intermediate State: A simple example for issues where neither coverage nor values in the program provide relevant feedback are magic byte checks. Out of the box, AFLstyle fuzzers will not be able to solve them. Note that various approaches try to solve this case using additional methods. However, the same problem persists in more complex cases: if the relationship between the input and the final comparison gets more complex, even techniques like concolic execution will fail. A human analyst on the other hand, can usually reason about how the program behaves and can often provide an indicator of progress. By encoding this indicator as additional artificial intermediate states, the analyst is able to guide the fuzzer. Note that for simple magic bytes like situations, this is exactly what LAF-INTEL does.
 
@@ -378,13 +375,12 @@ such as binary formats, it would likely not.
 
 > The resulting information is stored in a shared map that accumulates all edge counts during each test run. The fuzzer additionally maintains a global bitmap that contains all edge coverage encountered during the whole fuzzing campaign. The global bitmap is used to quickly check if a test input has triggered new coverage. AFL considers a test input interesting and stores it if it contains a previously unseen number of iterations on any edge. Since edges always connect two basic blocks, edges are encoded as a tuple consisting of two identifiers, one for the source basic block $id_s$ and one for a target block $id_t$. In the source code based versions, a static random value is assigned at compile-time to each basic block, which is used as $id_s$ or $id_t$. For binary-only implementations, it is common to use a cheap hash function applied to the address of the jump instruction/target instruction to derive the $id_s$ and $id_t$ values, respectively. This tuple ($id_s$, $id_t$) is then used to index a byte in the shared map. Typically, the index is calculated as $ (id_s \times 2) \oplus id_t $. The multiplication is used to efficiently distinguish self-loops.
 
-- 结果信息存储在一个共享图（映射？）中，该图（映射？）在每次测试运行期间累积所有边的计数。fuzzer还维护一个全局[位图](#bitmap-data-structure)，其中包含整个fuzzing活动期间遇到的所有边覆盖。全局位图用于快速检查测试输入是否触发了新的覆盖。如果测试输入包含任何边上以前未见的迭代次数，则AFL认为测试输入有趣并将其存储。由于边始终连接两个基本块，因此边被编码为一个由两个标识符组成的元组，一个用于源基本块$id_s$，一个用于目标块$id_t$。在基于源代码的版本中，每个基本块在编译时被分配一个静态随机值，该值用作$id_s$或$id_t$。对于仅二进制实现，通常使用应用于跳转指令/目标指令地址的便宜哈希函数来分别推导$id_s$和$id_t$值。然后，这个元组（$id_s$，$id_t$）用于索引共享图（映射？）中的一个字节。通常，索引计算为$ (id_s \times 2) \oplus id_t $。乘法用于有效区分自环。
+- 结果信息存储在一个共享图中，该图在每次测试运行期间累积所有边的计数。fuzzer还维护一个全局[位图](#bitmap-data-structure)，其中包含整个fuzzing活动期间遇到的所有边覆盖。全局位图用于快速检查测试输入是否触发了新的覆盖。如果测试输入包含任何边上以前未见的迭代次数，则AFL认为测试输入有趣并将其存储。由于边始终连接两个基本块，因此边被编码为一个由两个标识符组成的元组，一个用于源基本块$id_s$，一个用于目标块$id_t$。在基于源代码的版本中，每个基本块在编译时被分配一个静态随机值，该值用作$id_s$或$id_t$。对于仅二进制实现，通常使用应用于跳转指令/目标指令地址的便宜哈希函数来分别推导$id_s$和$id_t$值。然后，这个元组（$id_s$，$id_t$）用于索引共享图（映射？）中的一个字节。通常，索引计算为$ (id_s \times 2) \oplus id_t $。乘法用于有效区分自环。
 
-<!--TODO: 这里是应该翻译成图还是映射-->
 
 > Before each new test run, the shared map is cleared. During the test run, each time an edge is encountered, the corresponding byte in the shared map is incremented. This implies that edge counts greater than 255 will overflow and might register as any number between 0 and 255. After the execution finished, the edge counts are bucketed such that each byte in the shared map with a non-zero edge count contains a power of 2. To this end, edge counts are discretized into the following ranges 1, 2, 3, 4 . . . 7, 8 . . . 15, 16 . . . 31, 32 . . . 127, 128 . . . 255. Each range of edge counts is assigned to one specific power of 2. To increase the precision on uncommon edges, 3 also maps to a unique power of 2, while the range 32 to 64 is omitted. Then we can compare the shared map against a global bitmap, which contains all bits that were previously observed in prior runs. If any new bit is set, the test input is stored because it has led to increased coverage, and the global bitmap is updated to contain the new coverage.
 
-- 在每次新的测试运行之前，共享图（映射？）被清除。在测试运行期间，每次遇到一个边，共享图（映射？）中的相应字节就会增加。这意味着边计数大于255将溢出，并可能注册为0到255之间的任何数字。执行完成后，边计数被[分桶](#bucketed)，以便共享图（映射？）中具有非零边计数的每个字节都包含2的幂。为此，边计数被离散化为以下范围1、2、3、4...7、8...15、16...31、32...127、128...255。每个边计数范围都分配给一个特定的2的幂。为了增加对不常见边的精度，3也映射到一个唯一的2的幂，而32到64的范围被省略。然后，我们可以将共享图（映射？）与全局位图进行比较，全局位图包含以前运行中观察到的所有位。如果设置了任何新位，测试输入将被存储，因为它导致了覆盖率的增加，并且全局位图被更新以包含新的覆盖率。
+- 在每次新的测试运行之前，共享图被清除。在测试运行期间，每次遇到一个边，共享图中的相应字节就会增加。这意味着边计数大于255将溢出，并可能注册为0到255之间的任何数字。执行完成后，边计数被[分桶](#bucketed)，以便共享图中具有非零边计数的每个字节都包含2的幂。为此，边计数被离散化为以下范围1、2、3、4...7、8...15、16...31、32...127、128...255。每个边计数范围都分配给一个特定的2的幂。为了增加对不常见边的精度，3也映射到一个唯一的2的幂，而32到64的范围被省略。然后，我们可以将共享图与全局位图进行比较，全局位图包含以前运行中观察到的所有位。如果设置了任何新位，测试输入将被存储，因为它导致了覆盖率的增加，并且全局位图被更新以包含新的覆盖率。
 
 <!-- TODO: AFL统计的频率有什么用？从IJON_SET设置最低有效位图位引发的思考-->
 
