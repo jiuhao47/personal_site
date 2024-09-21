@@ -1,0 +1,1701 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../Chapter-2/">
+      
+      
+        <link rel="next" href="../Chapter-4/">
+      
+      
+      <link rel="icon" href="../../assets/icons8-no-internet-96.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
+    
+    
+      
+        <title>Chapter 3 - SYSTEM CENTER SPACE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.06209087.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+  
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+  
+  <style>.md-tag.md-tag--tag_identifier{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.5 7A1.5 1.5 0 0 1 4 5.5 1.5 1.5 0 0 1 5.5 4 1.5 1.5 0 0 1 7 5.5 1.5 1.5 0 0 1 5.5 7m15.91 4.58-9-9C12.05 2.22 11.55 2 11 2H4c-1.11 0-2 .89-2 2v7c0 .55.22 1.05.59 1.41l8.99 9c.37.36.87.59 1.42.59s1.05-.23 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.56-.23-1.06-.59-1.42"/></svg>');}.md-tag.md-tag--html{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="m0 32 34.9 395.8L191.5 480l157.6-52.2L384 32zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1z"/></svg>');}.md-tag.md-tag--js{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M0 32v448h448V32zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6"/></svg>');}.md-tag.md-tag--css{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="m480 32-64 368-223.3 80L0 400l19.6-94.8h82l-8 40.6L210 390.2l134.1-44.4 18.8-97.1H29.5l16-82h333.7l10.5-52.7H56.3l16.3-82z"/></svg>');}</style>
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CHack+Nerd+Font:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Hack Nerd Font"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SYSTEM CENTER SPACE" class="md-header__button md-logo" aria-label="SYSTEM CENTER SPACE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.82 14H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .5-.04 1-.1 1.46.6-.5 1.32-.89 2.1-1.14V12c0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2v.18c.7.17 1.35.45 1.95.82.05-.32.05-.66.05-1 0-5.5-4.5-10-10-10C6.47 2 2 6.5 2 12s4.5 10 10 10c.34 0 .68 0 1-.05-.41-.66-.71-1.4-.87-2.2-.04.07-.08.14-.13.21-.83-1.2-1.5-2.53-1.91-3.96h2.41c.31-.75.76-1.42 1.32-2m5.1-6h-2.95a15.7 15.7 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2H8c.35 1.25.8 2.45 1.4 3.56A8 8 0 0 1 5.08 16M8 8H5.08A7.92 7.92 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m10.5 6C16 14 14 16 14 18.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5m0 7.5c-1.66 0-3-1.34-3-3 0-.56.15-1.08.42-1.5L20 21.08c-.42.27-.94.42-1.5.42m2.58-1.5L17 15.92c.42-.27.94-.42 1.5-.42 1.66 0 3 1.34 3 3 0 .56-.15 1.08-.42 1.5"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SYSTEM CENTER SPACE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 3
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jiuhao47/personal_site" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jiuhao47/personal_site
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../blog/" class="md-tabs__link">
+          
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../tags/" class="md-tabs__link">
+        
+  
+    
+  
+  Tags
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  OS
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ctf/" class="md-tabs__link">
+          
+  
+  CTF
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SYSTEM CENTER SPACE" class="md-nav__button md-logo" aria-label="SYSTEM CENTER SPACE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.82 14H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .5-.04 1-.1 1.46.6-.5 1.32-.89 2.1-1.14V12c0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2v.18c.7.17 1.35.45 1.95.82.05-.32.05-.66.05-1 0-5.5-4.5-10-10-10C6.47 2 2 6.5 2 12s4.5 10 10 10c.34 0 .68 0 1-.05-.41-.66-.71-1.4-.87-2.2-.04.07-.08.14-.13.21-.83-1.2-1.5-2.53-1.91-3.96h2.41c.31-.75.76-1.42 1.32-2m5.1-6h-2.95a15.7 15.7 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2H8c.35 1.25.8 2.45 1.4 3.56A8 8 0 0 1 5.08 16M8 8H5.08A7.92 7.92 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m10.5 6C16 14 14 16 14 18.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5m0 7.5c-1.66 0-3-1.34-3-3 0-.56.15-1.08.42-1.5L20 21.08c-.42.27-.94.42-1.5.42m2.58-1.5L17 15.92c.42-.27.94-.42 1.5-.42 1.66 0 3 1.34 3 3 0 .56-.15 1.08-.42 1.5"/></svg>
+
+    </a>
+    SYSTEM CENTER SPACE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jiuhao47/personal_site" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jiuhao47/personal_site
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/archive/2024/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2024
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/discussion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Discussion
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/fuzz/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fuzz
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/paper-reading-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paper Reading Notes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/source-code-reading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Source Code Reading
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tags/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tags
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    OS
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            OS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Index
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内容简介
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Chapter 3
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 3
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      第三章：页表
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第三章：页表">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-paging-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Paging hardware
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-kernel-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Kernel address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-code-creating-an-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 Code: creating an address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-physical-memory-allocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.4 Physical memory allocation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-code-physical-memory-allocator" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.5 Code: Physical memory allocator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-process-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.6 Process address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-code-sbrk" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.7 Code: sbrk
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-code-exec" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.8 Code: exec
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#39-real-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.9 Real world
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#310-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.10 Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 4
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 5
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 6
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 7
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-8/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 8
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chapter-9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 9
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    CTF
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            CTF
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Index
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ctf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    介绍
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      第三章：页表
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第三章：页表">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-paging-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Paging hardware
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-kernel-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Kernel address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-code-creating-an-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 Code: creating an address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-physical-memory-allocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.4 Physical memory allocation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-code-physical-memory-allocator" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.5 Code: Physical memory allocator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-process-address-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.6 Process address space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-code-sbrk" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.7 Code: sbrk
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-code-exec" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.8 Code: exec
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#39-real-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.9 Real world
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#310-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.10 Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/jiuhao47/personal_site/edit/main/docs/os/Chapter-3.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-1.9l10-10V8l-6-6zm7 1.5L18.5 9H13zm7.1 9.5c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-2 1.8L12 20.9V23h2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/jiuhao47/personal_site/raw/main/docs/os/Chapter-3.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5m-7.86-1.75L8.85 19l.29-.74C10.43 15.06 13.5 13 17 13c1.05 0 2.06.21 3 .56V8l-6-6H6c-1.11 0-2 .89-2 2v16a2 2 0 0 0 2 2h4.5c-.55-.66-1-1.42-1.36-2.25M13 3.5 18.5 9H13z"/></svg>
+    </a>
+  
+
+
+  <h1>Chapter 3</h1>
+
+<h2 id="_1">第三章：页表<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>通过页表机制，操作系统为每个进程提供各自私有的地址空间和内存。页表决定了内存地址的含义，以及物理内存的哪些部分可以被访问。它们允许 xv6 隔离不同进程的地址空间，并将它们映射到物理内存上。页表还提供了一个间接层次，允许 xv6 实现一些技巧：在几个地址空间中映射同一内存（trampoline 页），以及用一个未映射页来保护内核栈和用户栈。本章其余部分将解释 RISC-V 硬件提供的页表以及 xv6 如何使用它们。</p>
+<h3 id="31-paging-hardware">3.1  Paging hardware<a class="headerlink" href="#31-paging-hardware" title="Permanent link">&para;</a></h3>
+<p>提醒一下，RISC-V 指令（包括用户和内核）操作的是虚拟地址。机器的 RAM，或者说物理内存，是用物理地址来做索引的。RISC-V的页表硬件通过将每个虚拟地址映射到一个物理地址将这两种地址联系起来。</p>
+<p>xv6运行在Sv39 RISC-V上，这意味着只会使用64位虚拟地址的低39位，高25位没有被使用。在这种Sv39配置中，一个RISC-V页表在逻辑上是一个由2²⁷（134,217,728）个<b>页表项（Page Table Entry, PTE）</b>组成的数组。每个**PTE**包含一个44位的<b>物理页号（Physical Page Number, PPN）</b>和一些标志位。分页硬件通过利用39位中的高27位索引到页表中找到一个**PTE**来转换一个虚拟地址，并计算出一个56位的物理地址，它的前44位来自于**PTE**中的**PPN**，而它的后12位则是从原来的虚拟地址复制过来的。图3.1显示了这个过程，在逻辑上可以把页表看成是一个简单的**PTE**数组（更完整的描述见图3.2）。页表让操作系统控制虚拟地址到物理地址的转换，其粒度为4096（2¹²）字节的对齐块。这样的分块称为页。</p>
+<p>在Sv39 RISC-V中，虚拟地址的高25位不用于地址转换；将来，RISC-V可能会使用这些位来定义更多的转换层。物理地址也有增长的空间：在**PTE**格式中，物理页号还有 10 位的增长空间。</p>
+<p><img alt="img" src="../assets/Figure-3.1.jpg" /> </p>
+<p>如图 3.2 所示，实际上转换过程分三步进行。一个页表以三层树的形式存储在物理内存中。树的根部是一个 4096 字节的页表页，它包含 512 个 PTE，这些 PTE 包含树的下一级页表页的物理地址。每一页都包含 512 个 PTE，用于指向下一个页表或物理地址。分页硬件用 27 位中的高 9 位选择根页表页中的 PTE，用中间 9 位选择树中下一级页表页中的 PTE，用低 9 位选择最后的 PTE。</p>
+<p>如果转换一个地址所需的三个 PTE 中的任何一个不存在，分页硬件就会引发一个**缺页异常（page-fault exception）**，让内核来处理这个异常（见第 4 章）。这种三层结构允许页表在处理大范围的虚拟地址没有被映射这种常见情况时，能够忽略整个页表。</p>
+<p>每个 PTE 都包含标志位，用于告诉分页硬件相关的虚拟地址被允许怎样使用。<code>PTE_V</code> 表示 PTE 是否存在：如果没有设置，对该页的引用会引起异常（即不允许）。<code>PTE_R</code> 控制是否允许指令读取该页。<code>PTE_W</code> 控制是否允许指令向该页写入。<code>PTE_X</code> 控制 CPU 是否可以将页面的内容解释为指令并执行。<code>PTE_U</code> 控制是否允许用户态下的指令访问页面；如果不设置 <code>PTE_U</code>， 对应 PTE 只能在内核态下使用。图 3.2 显示了这一切的工作原理。标志位和与分页硬件相关的数据结构定义在（<code>kernel/riscv.h</code>）中。</p>
+<p><img alt="img" src="../assets/Figure-3.2.jpg" /></p>
+<p>要告诉硬件使用一个页表，内核必须将对应根页表页的物理地址写入 <code>satp</code> 寄存器中。每个 CPU 都有自己的 <code>satp</code> 寄存器。一个 CPU 将使用自己的 <code>satp</code> 所指向的页表来翻译后续指令产生的所有地址。每个 CPU 都有自己的 <code>satp</code>，这样不同的 CPU 可以运行不同的进程，每个进程都有自己的页表所描述的私有地址空间。</p>
+<p>关于术语的一些说明：物理内存指的是 <strong>DRAM</strong> 中的存储单元。物理存储器的一个字节有一个地址，称为物理地址。当指令操作虚拟地址时，分页硬件会将其翻译成物理地址，然后发送给 DRAM 硬件，以读取或写入存储。不像物理内存和虚拟地址，虚拟内存不是一个物理对象，而是指内核提供的管理物理内存和虚拟地址的抽象和机制的集合。</p>
+<h3 id="32-kernel-address-space">3.2  Kernel address space<a class="headerlink" href="#32-kernel-address-space" title="Permanent link">&para;</a></h3>
+<p>Xv6 为每个进程维护一个用于描述进程的用户地址空间的页表，外加一个单独的描述内核地址空间的页表。内核配置其地址空间的布局，使其能够通过可预测的虚拟地址访问物理内存和各种硬件资源。图 3.3 显示了这个设计是如何将内核虚拟地址映射到物理地址的。文件（<code>kernel/memlayout.h</code>）声明了 xv6 内核内存布局的常量。</p>
+<p><img alt="img" src="../assets/Figure-3.3.jpg" /> </p>
+<p>QEMU 模拟的计算机包含 RAM（ 物理内存），从物理地址 <code>0x80000000</code> 开始， 至少到 <code>0x86400000</code>，xv6 称之为 <code>PHYSTOP</code>。QEMU 模拟还包括 I/O 设备，如磁盘接口。QEMU 将设备接口作为<b>内存映射（memory-mapped）</b>的控制寄存器暴露给软件，这些寄存器位于物理地址空间的 <code>0x80000000</code> 以下。内核可以通过读取/写入这些特殊的物理地址与设备进行交互；这种读取和写入与设备硬件而不是与 RAM 进行通信。第 4 章解释了 xv6 如何与设备交互。</p>
+<p>内核对RAM和内存映射的设备寄存器使用“直接映射”，也就是将这些资源映射到和它们物理地址相同的虚拟地址上。例如，内核本身在虚拟地址空间和物理内存中的位置都是<code>KERNBASE=0x80000000</code>。直接映射简化了读/写物理内存的内核代码。例如，当 <code>fork</code> 为子进程分配用户内存时，分配器返回该内存的物理地址；<code>fork</code> 在将父进程的用户内存复制到子进程时，直接使用该地址作为虚拟地址。</p>
+<p>有几个内核虚拟地址不是直接映射：</p>
+<ul>
+<li>
+<p>trampoline 页。它被映射在虚拟地址空间的顶端；用户页表也有这个映射。第 4 章讨论了 trampoline 页的作用，但我们在这里看到了页表的一个有趣的用例；一个物理页（存放 trampoline 代码）在内核的虚拟地址空间中被映射了两次：一次是在虚拟地址空间的顶部，一次是直接映射。</p>
+</li>
+<li>
+<p>内核栈页。每个进程都有自己的内核栈，内核栈被映射到高地址处，所以 xv6 可以在它后面留下一个未映射的守护页。守护页的 PTE 是无效的（不设置 <code>PTE_V</code> 位），这样如果内核栈溢出，很可能会引起异常，内核会报错。如果没有防护页，栈溢出时会覆盖其他内核内存，导致不正确的操作。报错还是比较好的。</p>
+</li>
+</ul>
+<p>内核通过高地址映射使用它的栈空间，栈空间也可以通过直接映射的地址被内核访问。另一种的设计是只使用直接映射，并在直接映射的地址上使用 stack。但是在这种安排中，提供保护页将涉及到取消映射虚拟地址，否则这些地址将指向物理内存，这将很难使用。</p>
+<p>内核将 trampoline 和 text（可执行程序的代码段）映射为有 <code>PTE_R</code> 和 <code>PTE_X</code> 权限的页。内核从这些页读取和执行指令。内核映射的其他页会有 <code>PTE_R</code> 和 <code>PTE_W</code> 权限，以便内核读写这些页面的内存。守护页的映射是无效的（不设置 <code>PTE_V</code>）。 </p>
+<h3 id="33-code-creating-an-address-space">3.3  Code: creating an address space<a class="headerlink" href="#33-code-creating-an-address-space" title="Permanent link">&para;</a></h3>
+<p>大部分用于操作地址空间和页表的 xv6 代码都在<code>vm.c</code>（<code>kernel/vm.c:1</code>）中。核心数据结构是 <code>pagetable_t</code>，它实际上是一个指向 RISC-V 根页表页的指针；<code>pagetable_t</code>可以是内核页表，也可以是进程的页表。核心函数是 <code>walk</code> 和 <code>mappages</code>，前者通过虚拟地址得到 PTE，后者将虚拟地址映射到物理地址。以 <code>kvm</code> 开头的函数操作内核页表；以 <code>uvm</code> 开头的函数操作用户页表；其他函数同时用于这两种页表。<code>copyout</code>和<code>copyin</code>将数据复制到或复制出被作为系统调用参数的用户虚拟地址；它们在 <code>vm.c</code> 中，因为它们需要显式转换用户空间的地址，以便找到相应的物理内存。</p>
+<p>在机器启动时，在启动序列的靠前部分，<code>main</code> 调用 <code>kvminit</code>（<code>kernel/vm.c:22</code>）来创建内核页表。这个调用发生在 xv6 在 RISC-V 启用分页之前，所以地址直接指向物理内存。<code>kvminit</code> 首先分配一页物理内存来存放根页表页。然后调用 <code>kvmmap</code> 将内核所需要的硬件资源映射到物理地址。这些资源包括内核的指令和数据，<code>KERNBASE</code> 到 <code>PHYSTOP</code>的物理内存，以及实际上是设备的内存范围。</p>
+<p><code>kvmmap</code>（<code>kernel/vm.c:118</code>）调用 <code>mappages</code>（<code>kernel/vm.c:149</code>），它将指定范围的虚拟地址映射到一段物理地址。它将范围内地址分割成多页（忽略余数），每次映射一页的起始地址。对于每个要映射的虚拟地址（页的起始地址），<code>mapages</code> 调用 <code>walk</code> 找到该地址的最后一级 PTE 的地址。然后，它配置 PTE，使其持有相关的物理页号、所需的权限（<code>PTE_W</code>、<code>PTE_X</code>和/或<code>PTE_R</code>），以及<code>PTE_V</code>来标记 PTE 为有效（<code>kernel/vm.c:161</code>）。</p>
+<p><code>walk</code>（<code>kernel/vm.c:72</code>）模仿 RISC-V 分页硬件查找虚拟地址的 PTE（见图 3.2）。<code>walk</code> 每次降低 9 位来查找三级页表。它使用每一级的 9 位虚拟地址来查找下一级页表或最后一级（<code>kernel/vm.c:78</code>）的 PTE。如果 PTE 无效，那么所需的物理页还没有被分配；如果 <code>alloc</code> 参数被设置，<code>walk</code> 会分配一个新的页表页，并把它的物理地址放在 PTE 中。它返回 树中最低层PTE的地址（<code>kernel/vm.c:88</code>）。</p>
+<p><code>main</code> 调用 <code>kvminithart</code>（<code>kernel/vm.c:53</code>）来映射内核页表。它将根页表页的物理地址写入寄存器 <code>satp</code> 中。在这之后，CPU 将使用内核页表翻译地址。由于内核使用唯一映射，所以指令的虚拟地址将映射到正确的物理内存地址。</p>
+<p><code>procinit</code>（<code>kernel/proc.c:26</code>），它由 <code>main</code> 调用，为每个进程分配一个内核栈。它将每个栈映射在 <code>KSTACK</code> 生成的虚拟地址上，这就为栈守护页留下了空间。<code>kvmmap</code> 将对应的PTE加入到内核页表中，然后调用 <code>kvminithart</code> 将内核页表重新加载到 <code>satp</code> 中，这样硬件就知道新的 PTE 了。</p>
+<p>每个 RISC-V CPU 都会在 **Translation Look-aside Buffer(TLB)**中缓存页表项，当 xv6 改变页表时，必须告诉 CPU 使相应的缓存 TLB 项无效。如果它不这样做，那么在以后的某个时刻，TLB 可能会使用一个旧的缓存映射，指向一个物理页，而这个物理页在此期间已经分配给了另一个进程，这样的话，一个进程可能会在其他进程的内存上“乱写乱画“。RISC-V 有一条指令 <code>sfence.vma</code>，可以刷新当前 CPU 的 TLB。xv6 在<code>kvminithart</code>中，重新加载 <code>satp</code> 寄存器后， 执行 <code>sfence.vma</code>，也会在从内核空间返回用户空间前，切换到用户页表的trampoline 代码中执行 <code>sfence.vma</code>（<code>kernel/trampoline.S:79</code>）。</p>
+<h3 id="34-physical-memory-allocation">3.4  Physical memory allocation<a class="headerlink" href="#34-physical-memory-allocation" title="Permanent link">&para;</a></h3>
+<p>内核必须在运行时为页表、用户内存、内核堆栈和管道缓冲区分配和释放物理内存。xv6 使用内核地址结束到 <code>PHYSTOP</code> 之间的物理内存来进行运行时分配。它每次分配和释放整个4096 字节的页面。它通过保存空闲页链表，来记录哪些页是空闲的。分配包括从链表中删除一页；释放包括将释放的页面添加到空闲页链表中。</p>
+<h3 id="35-code-physical-memory-allocator">3.5  Code: Physical memory allocator<a class="headerlink" href="#35-code-physical-memory-allocator" title="Permanent link">&para;</a></h3>
+<p>分配器在 <code>kalloc.c</code>（<code>kernel/kalloc.c:1</code>）中。分配器的数据结构是一个可供分配的物理内存页的**空闲链表**，每个空闲页的链表元素是一个结构体 <code>struct run</code>（<code>kernel/kalloc.c:17</code>）。分配器从哪里获得内存来存放这个结构体呢？它把每个空闲页的 <code>run</code> 结构体存储在空闲页自身里面，因为那里没有其他东西存储。空闲链表由一个**自旋锁**保护（<code>kernel/kalloc.c:21-24</code>）。链表和锁被包裹在一个结构体中，以明确锁保护的是结构体中的字段。现在，请忽略锁以及 <code>acquire</code> 和<code>release</code> 的调用；第 6 章将详细研究锁。</p>
+<p><code>main</code> 调用 <code>kinit</code> 来初始化分配器（<code>kernel/kalloc.c:27</code>）。<code>kinit</code> 初始化空闲页链表，以保存内核地址结束到 <code>PHYSTOP</code> 之间的每一页。xv6 应该通过解析硬件提供的配置信息来确定有多少物理内存可用。但是它没有这么做，而是假设机器有 128M 字节的 RAM。<code>kinit</code> 通过调用<code>freerange</code> 来添加内存到空闲页链表，<code>freerange</code> 则对每一页都调用 <code>kfree</code>。PTE 只能指向按4096 字节对齐的物理地址（4096 的倍数），因此 <code>freerange</code> 使用 <code>PGROUNDUP</code> 来确保它只添加对齐的物理地址到空闲链表中。分配器开始时没有内存；这些对 <code>kfree</code> 的调用给了它一些内存管理。</p>
+<p>分配器有时把地址当作整数来处理，以便对其进行运算（如 <code>freerange</code> 遍历所有页）， 有时把地址当作指针来读写内存（如操作存储在每页中的 <code>run</code> 结构体）；这种对地址的双重使用是分配器代码中充满 C 类型转换的主要原因。另一个原因是，释放和分配本质上改变了内存的类型。</p>
+<p><code>kfree</code>（<code>kernel/kalloc.c:47</code>）将被释放的内存中的每个字节设置为1。这将使得释放内存后使用内存的代码（使用悬空引用）将会读取垃圾而不是旧的有效内容；希望这将导致这类代码更快地崩溃。然后 <code>kfree</code> 将页面预存入释放列表：它将 <code>pa</code>（物理地址）转为指向结构体 <code>run</code> 的指针，在 <code>r-&gt;next</code> 中记录空闲链表之前的节点，并将释放列表设为 <code>r</code>。<code>kalloc</code>移除并返回空闲链表中的第一个元素。</p>
+<h3 id="36-process-address-space">3.6  Process address space<a class="headerlink" href="#36-process-address-space" title="Permanent link">&para;</a></h3>
+<p>每个进程都有一个单独的页表，当 xv6 在进程间切换时，也会改变页表。如图 2.3 所示，一个进程的用户内存从虚拟地址 0 开始，可以增长到 <code>MAXVA</code>（<code>kernel/riscv.h:348</code>），原则上允许一个进程寻址 256GB 的内存。</p>
+<p>当一个进程要求 xv6 提供更多的用户内存时，xv6 首先使用 <code>kalloc</code> 来分配物理页，然后将指向新物理页的 PTE 添加到进程的页表中。Xv6 设置这些 PTE 的 <code>PTE_W</code>、<code>PTE_X</code>、<code>PTE_R</code>、<code>PTE_U</code> 和 <code>PTE_V</code> 标志。大多数进程不使用整个用户地址空间；xv6 将不使用的 PTE 的 <code>PTE_V</code> 位保持为清除状态。</p>
+<p>我们在这里看到了几个有趣例子，是关于使用页表的。首先，不同的进程页表将用户地址转化为物理内存的不同页，这样每个进程都有私有的用户内存。第二，每个进程都认为自己的内存具有从零开始的连续的虚拟地址，而进程的物理内存可以是不连续的。第三，内核会映射带有 <code>trampoline</code> 代码的页到用户地址空间顶端，因此，有一物理内存页在所有地址空间中都会出。</p>
+<p><img alt="img" src="../assets/Figure-3.4.jpg" /></p>
+<p>图 3.4 更详细地显示了 xv6 中执行进程的用户内存布局。栈只有一页，图中显示的是由<code>exec</code> 创建的初始内容。位于栈顶部的字符串中包含了命令行中输入的参数和指向他们的指针数组。在下方是允许程序在 <code>main</code> 启动的值，就像函数 <code>main(argc, argv)</code> 是刚刚被调用一样<a href="#ftn1">[1]</a>。</p>
+<p>为了检测用户栈溢出分配的栈内存，xv6 会在 stack 的下方放置一个无效的保护页。如果用户栈溢出，而进程试图使用栈下面的地址，硬件会因为该映射无效而产生一个缺页异常。一个现实世界中的操作系统可能会在用户栈溢出时自动为其分配更多的内存。</p>
+<h3 id="37-code-sbrk">3.7  Code: sbrk<a class="headerlink" href="#37-code-sbrk" title="Permanent link">&para;</a></h3>
+<p><code>sbrk</code> 是 一 个 进 程 收 缩 或 增 长 内 存 的 系 统 调 用 。 该 系 统 调 用 由 函 数<code>growproc</code>（<code>kernel/proc.c:239</code>）实现，<code>growproc</code> 调用 <code>uvmalloc</code> 或 <code>uvmdealloc</code>，取决于 <code>n</code> 是正数还是负数。<code>uvmalloc</code>（<code>kernel/vm.c:229</code>）通过 <code>kalloc</code> 分配物理内存，并使用 <code>mappages</code> 将 PTE 添加到用户页表中。 <code>uvmdealloc</code> 调用 <code>uvmunmap</code>（<code>kernel/vm.c:174</code>），它使用 <code>walk</code> 来查找 PTE 并使用 <code>kfree</code> 来释放它们所引用的物理内存。</p>
+<p>xv6 使用进程的页表不仅是为了告诉硬件如何映射用户虚拟地址，也是将其作为分配给该进程的物理地址的唯一记录。这就是为什么释放用户内存（<code>uvmunmap</code> 中）需要检查用户页表的原因。</p>
+<h3 id="38-code-exec">3.8  Code: exec<a class="headerlink" href="#38-code-exec" title="Permanent link">&para;</a></h3>
+<p><code>exec</code> 是创建一个地址空间的用户部分的系统调用。它读取储存在文件系统上的文件用来初始化一个地址空间的用户部分。<code>exec</code>（<code>kernel/exec.c:13</code>）使用 <code>namei</code>（<code>kernel/exec.c:26</code>）打开二进制文件路径，这在第 8 章中有解释。然后，它读取 ELF 头。xv6 应用程序用 ELF 格式来描述可执行文件，它定义在（<code>kernel/elf.h</code>）。一个 ELF 二进制文件包括一个 ELF 头，<code>struct elfhdr</code>（<code>kernel/elf.h:6</code>）。之后是一串程序段头（program section header），<code>struct proghdr</code>（<code>kernel/elf.h:25</code>）。每一个<code>proghdr</code>描述了应用的一个必须加载到内存中的程序段；xv6 程序只有一个程序段头，但其他系统可能有分开的指令段和数据段需要加载到内存。</p>
+<p>第一步是快速检查文件是否是ELF格式。一个 ELF 二进制文件以四个字节的“魔法数字” <code>0x7F</code>、<code>E</code>、<code>L</code>、<code>F</code>或 <code>ELF_MAGIC</code>（<code>kernel/elf.h:3</code>）开始。如果 ELF 头有正确的”魔法数字“，<code>exec</code>就会认为该二进制文件是正确的类型。</p>
+<p><code>exec</code>使用<code>proc_pagetable</code>（<code>kernel/exec.c:38</code>）分配一个没有使用的页表，使用 <code>uvmalloc</code>（<code>kernel/exec.c:52</code>）为每一个 ELF 段分配内存，使用 <code>loadseg</code>（<code>kernel/exec.c:10</code>）加载每一个段到内存中。<code>loadseg</code>使用<code>walkaddr</code>找到分配内存的物理地址，在该地址写入 ELF 段的每一页，页的内容通过 <code>readi</code> 从文件中读取。</p>
+<p>用 <code>exec</code> 创建的第一个用户程序<code>/init</code> 的程序段头是这样的：</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
+<span class="normal"><a href="#__codelineno-0-2">2</a></span>
+<span class="normal"><a href="#__codelineno-0-3">3</a></span>
+<span class="normal"><a href="#__codelineno-0-4">4</a></span>
+<span class="normal"><a href="#__codelineno-0-5">5</a></span>
+<span class="normal"><a href="#__codelineno-0-6">6</a></span>
+<span class="normal"><a href="#__codelineno-0-7">7</a></span>
+<span class="normal"><a href="#__codelineno-0-8">8</a></span>
+<span class="normal"><a href="#__codelineno-0-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="c1"># objdump -p _init</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a>user/_init:<span class="w"> </span>file<span class="w"> </span>format<span class="w"> </span>elf64-littleriscv
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a>Program<span class="w"> </span>Header:
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">    </span>LOAD<span class="w"> </span>off<span class="w">    </span>0x00000000000000b0<span class="w"> </span>vaddr<span class="w"> </span>0x0000000000000000
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">                                   </span>paddr<span class="w"> </span>0x0000000000000000<span class="w"> </span>align<span class="w"> </span><span class="m">2</span>**3
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">         </span>filesz<span class="w"> </span>0x0000000000000840<span class="w"> </span>memsz<span class="w"> </span>0x0000000000000858<span class="w"> </span>flags<span class="w"> </span>rwx
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">   </span>STACK<span class="w"> </span>off<span class="w">    </span>0x0000000000000000<span class="w"> </span>vaddr<span class="w"> </span>0x0000000000000000
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">                                   </span>paddr<span class="w"> </span>0x0000000000000000<span class="w"> </span>align<span class="w"> </span><span class="m">2</span>**4
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">         </span>filesz<span class="w"> </span>0x0000000000000000<span class="w"> </span>memsz<span class="w"> </span>0x0000000000000000<span class="w"> </span>flags<span class="w"> </span>rw-
+</code></pre></div></td></tr></table></div>
+<p>程序段头的 <code>filesz</code> 可能小于 <code>memsz</code>，说明它们之间的空隙应该用 0来填充（对于 C 语言中的全局变量），而不是从文件中读取。对于<code>/init</code>来说，<code>filesz</code>是 2112 字节，<code>memsz</code>是 2136字节，因此 <code>uvmalloc</code> 分配了足够的物理内存来容纳 2136 字节，但只从文件<code>/init</code> 中读取 2112字节。</p>
+<p><code>exec</code> 在栈页的下方放置了一个不可访问页，这样程序如果试图使用多个页面，就会出现故障。这个不可访问的页还能允许<code>exec</code> 处理过大的参数；在这种情况下，<code>exec</code>用来复制参数到栈的 <code>copyout</code>（<code>kernel/vm.c:355</code>）函数会注意到目标页不可访问，并返回-1。</p>
+<p>在准备新的内存映像的过程中，如果 <code>exec</code> 检测到一个错误，比如一个无效的程序段， 它就会跳转到标签 <code>bad</code>，释放新的映像，并返回-1。<code>exec</code> 必须延迟释放旧映像，直到它确定<code>exec</code>系统调用会成功：如果旧映像消失了，系统调用就不能返回-1。<code>exec</code>中唯一的错误情况发生在创建映像的过程中。一旦镜像完成，<code>exec</code>就可以提交到新的页表（<code>kernel/exec.c:113</code>）并释放旧的页表（<code>kernel/exec.c:117</code>）。</p>
+<p><code>exec</code> 将 ELF 文件中的字节按 ELF 文件指定的地址加载到内存中。用户或进程可以将任何他们想要的地址放入 ELF 文件中。因此，<code>exec</code>是有风险的，因为 ELF 文件中的地址可能会意外地或故意地指向内核。对于一个不小心的内核来说，后果可能从崩溃到恶意颠覆内核的隔离机制(即安全漏洞)。xv6 执行了一些检查来避免这些风险。例如 <code>if (ph.vaddr + ph.memsz &lt; ph.vaddr)</code>检查总和是否溢出一个 64 位整数。危险的是，用户可以用指向用户选择的地址的 <code>ph.vaddr</code> 和足够大的 <code>ph.memsz</code> 来构造一个 ELF 二进制，使总和溢出到 <strong>0x1000</strong>，这看起来像是一个有效值。在旧版本的 xv6 中，用户地址空间也包含内核（但在用户模式下不可读/写），用户可以选择一个对应内核内存的地址，从而将 ELF 二进制中的数据复制到内核中。在 RISC-V 版本的 xv6 中，这是不可能的，因为内核有自己独立的页表；<code>loadseg</code>加载数据到进程的页表中，而不是内核的页表中。</p>
+<p>内核开发人员很容易忽略一个关键的检查，现实中的内核有很长一段缺少检查的空档期， 用户程序可以利用缺少这些检查来获得内核特权。xv6 在验证需要提供给内核的用户程序数据的时候，并没有完全验证其是否是恶意的，恶意用户程序可能利用这些数据来绕过 xv6 的隔离。</p>
+<h3 id="39-real-world">3.9  Real world<a class="headerlink" href="#39-real-world" title="Permanent link">&para;</a></h3>
+<p>像大多数操作系统一样，xv6 使用分页硬件进行内存保护和映射。大多数操作系统对分页的使用要比 xv6 复杂得多，它将分页和缺页异常结合起来，我们将在第 4 章中讨论。</p>
+<p>Xv6 的内核使用虚拟地址和物理地址之间的直接映射，这样会更简单，并假设在地址0x8000000 处有物理 RAM，即内核期望加载的地方。这在 QEMU 中是可行的，但是在真实的硬件上，它被证明是一个糟糕的想法；真实的硬件将 RAM 和设备放置在不可预测的物理地址上，例如在 0x8000000 处可能没有 RAM，而 xv6 期望能够在那里存储内核。更好的内核设计利用页表将任意的硬件物理内存布局变成可预测的内核虚拟地址布局。</p>
+<p>RISC-V 支持物理地址级别的保护，但 xv6 没有使用该功能。</p>
+<p>在有大量内存的机器上，使用 RISC-V 对超级页(4MB 的页)的支持可能是有意义的。当物理内存很小的时候，小页是有意义的，可以对磁盘进行精细地分配和分页。例如，如果一个程序只使用 8 千字节的内存，那么给它整整 4 兆字节的超级物理内存页是浪费的。更大的页在有大量内存的机器上是有意义的，可以减少页表操作的开销。</p>
+<p>xv6 内核缺乏一个类 malloc 的分配器为小程序提供内存，这使得内核没有使用需要动态分配的复杂数据结构，从而简化了设计。</p>
+<p>内存分配是一个常年的热门话题，基本问题是有效利用有限的内存和为未来未知的请求做准备<a href="#ftn2">[2]</a>。如今人们更关心的是速度而不是空间效率。此外，一个更复杂的内核可能会分配许多不同大小的小块，而不是（在 xv6 中）只分配 4096 字节的块；一个真正的内核分配器需要处理小块分配以及大块分配。</p>
+<h3 id="310-exercises">3.10  Exercises<a class="headerlink" href="#310-exercises" title="Permanent link">&para;</a></h3>
+<p>1、分析 RISC-V 的设备树（device tree），找出计算机有多少物理内存。</p>
+<p>2、编写一个用户程序，通过调用<code>sbrk(1)</code>使其地址空间增加一个字节。运行该程序，研究调用 <code>sbrk</code> 之前和调用<code>sbrk</code> 之后的程序页表。内核分配了多少空间？新内存的 PTE 包含哪些内容？</p>
+<p>3、修改 xv6 使得内核使用超级页 4M。</p>
+<p>4、修改 xv6，使用户程序间接引用一个空指针时，会收到一个异常，即修改 xv6，使用户程序的虚拟地址 0 不被映射。</p>
+<p>5、Unix 实现的 exec 传统上包括对 shell 脚本的特殊处理。如果要执行的文件以文本<code>#!</code>开头， 那么第一行就被认为是要运行的程序来解释文件。例如，如果调用 <code>exec</code> 运行 <code>myprog arg1</code>， 而 <code>myprog</code> 的第一行是<code>#!/interp</code>，那么<code>exec</code> 执行<code>/interp myprog arg1</code>。在 xv6 中实现对这个约定的支持。</p>
+<p>6、为内核实现地址空间的随机化。</p>
+<hr />
+<ol>
+<li><a name="ftn1"></a>即在栈中保存了从main返回所需要的信息</li>
+<li><a name="ftn2"></a>dereference，就是对地址取值，例如*p。</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../Chapter-2/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 2">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 2
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../Chapter-4/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 4">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Chapter 4
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Jiuhao
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/jiuhao47" target="_blank" rel="noopener" title="My Github Profile" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexs", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "tags": {"CSS": "css", "HTML5": "html", "JavaScript": "js", "tag1": "tag_identifier"}, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2478 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BBijon-exploring-deep-state-spaces-via-fuzzing-%E6%9B%B4%E6%96%B0%E4%B8%AD/">
+      
+      
+        <link rel="next" href="../../19/%E8%AE%B0%E7%AC%AC%E4%BA%8C%E6%AC%A1%E8%AE%BA%E6%96%87%E7%A0%94%E8%AE%A8/">
+      
+      
+      <link rel="icon" href="../../../../../assets/icons8-no-internet-96.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
+    
+    
+      
+        <title>Libfuzzer 源码阅读（一） - SYSTEM CENTER SPACE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.06209087.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+  
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+    
+    
+      
+    
+    
+  
+  
+  <style>.md-tag.md-tag--tag_identifier{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.5 7A1.5 1.5 0 0 1 4 5.5 1.5 1.5 0 0 1 5.5 4 1.5 1.5 0 0 1 7 5.5 1.5 1.5 0 0 1 5.5 7m15.91 4.58-9-9C12.05 2.22 11.55 2 11 2H4c-1.11 0-2 .89-2 2v7c0 .55.22 1.05.59 1.41l8.99 9c.37.36.87.59 1.42.59s1.05-.23 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.56-.23-1.06-.59-1.42"/></svg>');}.md-tag.md-tag--html{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="m0 32 34.9 395.8L191.5 480l157.6-52.2L384 32zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1z"/></svg>');}.md-tag.md-tag--js{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M0 32v448h448V32zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6"/></svg>');}.md-tag.md-tag--css{--md-tag-icon:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="m480 32-64 368-223.3 80L0 400l19.6-94.8h82l-8 40.6L210 390.2l134.1-44.4 18.8-97.1H29.5l16-82h333.7l10.5-52.7H56.3l16.3-82z"/></svg>');}</style>
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CHack+Nerd+Font:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Hack Nerd Font"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#libfuzzer" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="SYSTEM CENTER SPACE" class="md-header__button md-logo" aria-label="SYSTEM CENTER SPACE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.82 14H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .5-.04 1-.1 1.46.6-.5 1.32-.89 2.1-1.14V12c0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2v.18c.7.17 1.35.45 1.95.82.05-.32.05-.66.05-1 0-5.5-4.5-10-10-10C6.47 2 2 6.5 2 12s4.5 10 10 10c.34 0 .68 0 1-.05-.41-.66-.71-1.4-.87-2.2-.04.07-.08.14-.13.21-.83-1.2-1.5-2.53-1.91-3.96h2.41c.31-.75.76-1.42 1.32-2m5.1-6h-2.95a15.7 15.7 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2H8c.35 1.25.8 2.45 1.4 3.56A8 8 0 0 1 5.08 16M8 8H5.08A7.92 7.92 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m10.5 6C16 14 14 16 14 18.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5m0 7.5c-1.66 0-3-1.34-3-3 0-.56.15-1.08.42-1.5L20 21.08c-.42.27-.94.42-1.5.42m2.58-1.5L17 15.92c.42-.27.94-.42 1.5-.42 1.66 0 3 1.34 3 3 0 .56-.15 1.08-.42 1.5"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SYSTEM CENTER SPACE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Libfuzzer 源码阅读（一）
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jiuhao47/personal_site" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jiuhao47/personal_site
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../tags/" class="md-tabs__link">
+        
+  
+    
+  
+  Tags
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../os/" class="md-tabs__link">
+          
+  
+  OS
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../ctf/" class="md-tabs__link">
+          
+  
+  CTF
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="SYSTEM CENTER SPACE" class="md-nav__button md-logo" aria-label="SYSTEM CENTER SPACE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.82 14H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .5-.04 1-.1 1.46.6-.5 1.32-.89 2.1-1.14V12c0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2v.18c.7.17 1.35.45 1.95.82.05-.32.05-.66.05-1 0-5.5-4.5-10-10-10C6.47 2 2 6.5 2 12s4.5 10 10 10c.34 0 .68 0 1-.05-.41-.66-.71-1.4-.87-2.2-.04.07-.08.14-.13.21-.83-1.2-1.5-2.53-1.91-3.96h2.41c.31-.75.76-1.42 1.32-2m5.1-6h-2.95a15.7 15.7 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2H8c.35 1.25.8 2.45 1.4 3.56A8 8 0 0 1 5.08 16M8 8H5.08A7.92 7.92 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m10.5 6C16 14 14 16 14 18.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5m0 7.5c-1.66 0-3-1.34-3-3 0-.56.15-1.08.42-1.5L20 21.08c-.42.27-.94.42-1.5.42m2.58-1.5L17 15.92c.42-.27.94-.42 1.5-.42 1.66 0 3 1.34 3 3 0 .56-.15 1.08-.42 1.5"/></svg>
+
+    </a>
+    SYSTEM CENTER SPACE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jiuhao47/personal_site" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jiuhao47/personal_site
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2024/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2024
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/discussion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Discussion
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/fuzz/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fuzz
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/paper-reading-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paper Reading Notes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/source-code-reading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Source Code Reading
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../tags/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tags
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    OS
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            OS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Index
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内容简介
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-3/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 3
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-4/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 4
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 5
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 6
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 7
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-8/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 8
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../os/Chapter-9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Chapter 9
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    CTF
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            CTF
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Index
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../ctf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    介绍
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerbuiltinsh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerBuiltins.h
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FuzzerBuiltins.h">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      部分函数及命名空间定义
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerplatformh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerPlatform.h
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FuzzerPlatform.h">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      内存/地址检测器
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerbuiltinsmsvch" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerBuiltinsMsvc.h
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzercommandh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerCommand.h
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FuzzerCommand.h">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command类定义
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      公共成员
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      成员函数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      私有成员
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerioh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerIO.h
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerdefsh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerDefs.h
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzerutilh" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuzzerUtil.h
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../../../../../assets/logo.jpg" alt="Jiuhao">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Jiuhao
+                        
+                      </strong>
+                      <br>
+                      description
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2024-09-17 00:00:00" class="md-ellipsis">September 17, 2024</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/fuzz/">Fuzz</a>, 
+                              <a href="../../../../category/source-code-reading/">Source Code Reading</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              8 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+  
+
+<nav class="md-tags" >
+  
+    
+    
+      
+      
+    
+    
+      <a href="../../../../../tags/#fuzz" class="md-tag md-tag-icon">Fuzz</a>
+    
+  
+    
+    
+      
+      
+    
+    
+      <a href="../../../../../tags/#iie" class="md-tag md-tag-icon">IIE</a>
+    
+  
+    
+    
+      
+      
+    
+    
+      <a href="../../../../../tags/#libfuzzer" class="md-tag md-tag-icon">Libfuzzer</a>
+    
+  
+</nav>
+
+
+  
+    <a href="https://github.com/jiuhao47/personal_site/edit/main/docs/blog/posts/fuzzer/iie-libfuzzer-1.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-1.9l10-10V8l-6-6zm7 1.5L18.5 9H13zm7.1 9.5c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-2 1.8L12 20.9V23h2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/jiuhao47/personal_site/raw/main/docs/blog/posts/fuzzer/iie-libfuzzer-1.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5m-7.86-1.75L8.85 19l.29-.74C10.43 15.06 13.5 13 17 13c1.05 0 2.06.21 3 .56V8l-6-6H6c-1.11 0-2 .89-2 2v16a2 2 0 0 0 2 2h4.5c-.55-.66-1-1.42-1.36-2.25M13 3.5 18.5 9H13z"/></svg>
+    </a>
+  
+
+
+<h1 id="libfuzzer">Libfuzzer 源码阅读（一）<a class="headerlink" href="#libfuzzer" title="Permanent link">&para;</a></h1>
+<!-- more -->
+
+<h2 id="fuzzerbuiltinsh">FuzzerBuiltins.h<a class="headerlink" href="#fuzzerbuiltinsh" title="Permanent link">&para;</a></h2>
+<p>定义了一些包装函数和宏</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
+<span class="normal"><a href="#__codelineno-0-2">2</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerPlatform.h&quot;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdint&gt;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li>
+<p><code>cstdint</code> 是 C++11 引入的头文件，定义了一些标准的整数类型，如 <code>int8_t</code>、<code>int16_t</code>、<code>int32_t</code>、<code>int64_t</code>、<code>uint8_t</code>、<code>uint16_t</code>、<code>uint32_t</code>、<code>uint64_t</code> 等。</p>
+</li>
+<li>
+<p><a href="#fuzzerplatformh">FuzzerPlatform.h</a>：定义了一些平台相关的宏和函数。</p>
+</li>
+</ul>
+<h3 id="_1">部分函数及命名空间定义<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><code>C++</code>语言的命名空间是一种用于组织代码的机制，主要用于避免名称冲突。命名空间允许将标识符（如变量、函数、类等）分组，从而在不同的命名空间中可以使用相同的名称而不会产生冲突。</p>
+</blockquote>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-1-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-1-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-1-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-1-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-1-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-1-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-1-10">10</a></span>
+<span class="normal"><a href="#__codelineno-1-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="k">namespace</span><span class="w"> </span><span class="nn">fuzzer</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w">  </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">__builtin_bswap16</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">__builtin_bswap32</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">__builtin_bswap64</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">Clzll</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">__builtin_clzll</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">Popcountll</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">__builtin_popcountll</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><code>Bswap</code>系列函数：用于字节序转换，分别处理8位、16位、32位和64位整数。</li>
+<li><code>Clzll</code>：计算无符号长整型的前导零数量。</li>
+<li><code>Popcountll</code>：计算无符号长整型的位数中1的数量。</li>
+</ul>
+<h2 id="fuzzerplatformh">FuzzerPlatform.h<a class="headerlink" href="#fuzzerplatformh" title="Permanent link">&para;</a></h2>
+<p>主要用于定义与平台相关的宏，以便在不同操作系统上进行模糊测试</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-2-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-2-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-2-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-2-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-2-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-2-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-2-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-2-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-2-10">10</a></span>
+<span class="normal"><a href="#__codelineno-2-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="cp">#if defined(__has_feature)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="cp">#if __has_feature(address_sanitizer)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="cp">#define ATTRIBUTE_NO_SANITIZE_ALL ATTRIBUTE_NO_SANITIZE_ADDRESS</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="cp">#elif __has_feature(memory_sanitizer)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="cp">#define ATTRIBUTE_NO_SANITIZE_ALL ATTRIBUTE_NO_SANITIZE_MEMORY</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="cp">#else</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="cp">#define ATTRIBUTE_NO_SANITIZE_ALL</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="cp">#endif</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="cp">#else</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="cp">#define ATTRIBUTE_NO_SANITIZE_ALL</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="cp">#endif</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><code>__has_feature</code>：用于检查编译器是否支持某个特性。</li>
+<li><code>address_sanitizer</code>：地址检测器。</li>
+<li><code>memory_sanitizer</code>：内存检测器。</li>
+<li><code>ATTRIBUTE_NO_SANITIZE_ALL</code>：用于指示编译器不要对函数进行某种类型的检测。</li>
+</ul>
+<h3 id="_2">内存/地址检测器<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://clang.llvm.org/docs/AddressSanitizer.html">AddressSanitizer</a>：地址检测器，用于检测内存访问错误。</li>
+</ul>
+<h2 id="fuzzerbuiltinsmsvch">FuzzerBuiltinsMsvc.h<a class="headerlink" href="#fuzzerbuiltinsmsvch" title="Permanent link">&para;</a></h2>
+<p>主要用于在MSVC编译器下提供一些内置函数的替代实现</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerPlatform.h&quot;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><a href="#fuzzerplatformh">FuzzerPlatform.h</a>：定义了一些平台相关的宏和函数。</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span>
+<span class="normal"><a href="#__codelineno-4-2">2</a></span>
+<span class="normal"><a href="#__codelineno-4-3">3</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="c1">// __builtin_return_address() cannot be compiled with MSVC. Use the equivalent</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="c1">// from &lt;intrin.h&gt;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="cp">#define GET_CALLER_PC() _ReturnAddress()</span>
+</code></pre></div></td></tr></table></div>
+<p>定义了<code>GET_CALLER_PC()</code>宏，使用<code>_ReturnAddress()</code>替代<code>__builtin_return_address()</code>，因为后者在MSVC中不可用。</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span>
+<span class="normal"><a href="#__codelineno-5-13">13</a></span>
+<span class="normal"><a href="#__codelineno-5-14">14</a></span>
+<span class="normal"><a href="#__codelineno-5-15">15</a></span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span>
+<span class="normal"><a href="#__codelineno-5-17">17</a></span>
+<span class="normal"><a href="#__codelineno-5-18">18</a></span>
+<span class="normal"><a href="#__codelineno-5-19">19</a></span>
+<span class="normal"><a href="#__codelineno-5-20">20</a></span>
+<span class="normal"><a href="#__codelineno-5-21">21</a></span>
+<span class="normal"><a href="#__codelineno-5-22">22</a></span>
+<span class="normal"><a href="#__codelineno-5-23">23</a></span>
+<span class="normal"><a href="#__codelineno-5-24">24</a></span>
+<span class="normal"><a href="#__codelineno-5-25">25</a></span>
+<span class="normal"><a href="#__codelineno-5-26">26</a></span>
+<span class="normal"><a href="#__codelineno-5-27">27</a></span>
+<span class="normal"><a href="#__codelineno-5-28">28</a></span>
+<span class="normal"><a href="#__codelineno-5-29">29</a></span>
+<span class="normal"><a href="#__codelineno-5-30">30</a></span>
+<span class="normal"><a href="#__codelineno-5-31">31</a></span>
+<span class="normal"><a href="#__codelineno-5-32">32</a></span>
+<span class="normal"><a href="#__codelineno-5-33">33</a></span>
+<span class="normal"><a href="#__codelineno-5-34">34</a></span>
+<span class="normal"><a href="#__codelineno-5-35">35</a></span>
+<span class="normal"><a href="#__codelineno-5-36">36</a></span>
+<span class="normal"><a href="#__codelineno-5-37">37</a></span>
+<span class="normal"><a href="#__codelineno-5-38">38</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="k">namespace</span><span class="w"> </span><span class="nn">fuzzer</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w">  </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="c1">// Use alternatives to __builtin functions from &lt;stdlib.h&gt; and &lt;intrin.h&gt; on</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="c1">// Windows since the builtins are not supported by MSVC.</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">_byteswap_ushort</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">_byteswap_ulong</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">Bswap</span><span class="p">(</span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">_byteswap_uint64</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="c1">// The functions below were mostly copied from</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="c1">// compiler-rt/lib/builtins/int_lib.h which defines the __builtin functions used</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="c1">// outside of Windows.</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">Clzll</span><span class="p">(</span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">  </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">LeadZeroIdx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="cp">#if !defined(_M_ARM) &amp;&amp; !defined(_M_X64)</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="w">  </span><span class="c1">// Scan the high 32 bits.</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_BitScanReverse</span><span class="p">(</span><span class="o">&amp;</span><span class="n">LeadZeroIdx</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="o">&gt;</span><span class="p">(</span><span class="n">X</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">32</span><span class="p">)))</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20"></a><span class="w">        </span><span class="mi">63</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">LeadZeroIdx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">32</span><span class="p">));</span><span class="w"> </span><span class="c1">// Create a bit offset from the MSB.</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21"></a><span class="w">  </span><span class="c1">// Scan the low 32 bits.</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_BitScanReverse</span><span class="p">(</span><span class="o">&amp;</span><span class="n">LeadZeroIdx</span><span class="p">,</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="o">&gt;</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">63</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">LeadZeroIdx</span><span class="p">);</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24"></a>
+<a id="__codelineno-5-25" name="__codelineno-5-25"></a><span class="cp">#else</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_BitScanReverse64</span><span class="p">(</span><span class="o">&amp;</span><span class="n">LeadZeroIdx</span><span class="p">,</span><span class="w"> </span><span class="n">X</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">63</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">LeadZeroIdx</span><span class="p">;</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27"></a><span class="cp">#endif</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29"></a><span class="p">}</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30"></a>
+<a id="__codelineno-5-31" name="__codelineno-5-31"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">Popcountll</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32"></a><span class="cp">#if !defined(_M_ARM) &amp;&amp; !defined(_M_X64)</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">__popcnt</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">__popcnt</span><span class="p">(</span><span class="n">X</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">32</span><span class="p">);</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34"></a><span class="cp">#else</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">__popcnt64</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36"></a><span class="cp">#endif</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37"></a><span class="p">}</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38"></a><span class="p">}</span><span class="w">  </span><span class="c1">// namespace fuzzer</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><code>Bswap</code>系列函数：用于字节序转换，分别处理8位、16位、32位和64位整数。</li>
+<li><code>Clzll</code>：计算无符号长整型的前导零数量。</li>
+<li><code>Popcountll</code>：计算无符号长整型的位数中1的数量。</li>
+</ul>
+<h2 id="fuzzercommandh">FuzzerCommand.h<a class="headerlink" href="#fuzzercommandh" title="Permanent link">&para;</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span>
+<span class="normal"><a href="#__codelineno-6-2">2</a></span>
+<span class="normal"><a href="#__codelineno-6-3">3</a></span>
+<span class="normal"><a href="#__codelineno-6-4">4</a></span>
+<span class="normal"><a href="#__codelineno-6-5">5</a></span>
+<span class="normal"><a href="#__codelineno-6-6">6</a></span>
+<span class="normal"><a href="#__codelineno-6-7">7</a></span>
+<span class="normal"><a href="#__codelineno-6-8">8</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerDefs.h&quot;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerIO.h&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sstream&gt;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;thread&gt;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><a href="#fuzzerdefsh">FuzzerDefs.h</a>：定义了一些常量和数据结构。</li>
+<li><a href="#fuzzerioh">FuzzerIO.h</a>：定义了一些输入输出相关的函数。</li>
+<li><code>sstream</code>：定义了一些用于字符串流的类。</li>
+<li><code>algorithm</code>：定义了一些用于操作序列的函数。</li>
+<li><code>string</code>：定义了一些用于字符串操作的函数。</li>
+<li><code>vector</code>：定义了一些用于向量操作的函数。</li>
+<li><code>thread</code>：定义了一些用于线程操作的函数。</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">  1</a></span>
+<span class="normal"><a href="#__codelineno-7-2">  2</a></span>
+<span class="normal"><a href="#__codelineno-7-3">  3</a></span>
+<span class="normal"><a href="#__codelineno-7-4">  4</a></span>
+<span class="normal"><a href="#__codelineno-7-5">  5</a></span>
+<span class="normal"><a href="#__codelineno-7-6">  6</a></span>
+<span class="normal"><a href="#__codelineno-7-7">  7</a></span>
+<span class="normal"><a href="#__codelineno-7-8">  8</a></span>
+<span class="normal"><a href="#__codelineno-7-9">  9</a></span>
+<span class="normal"><a href="#__codelineno-7-10"> 10</a></span>
+<span class="normal"><a href="#__codelineno-7-11"> 11</a></span>
+<span class="normal"><a href="#__codelineno-7-12"> 12</a></span>
+<span class="normal"><a href="#__codelineno-7-13"> 13</a></span>
+<span class="normal"><a href="#__codelineno-7-14"> 14</a></span>
+<span class="normal"><a href="#__codelineno-7-15"> 15</a></span>
+<span class="normal"><a href="#__codelineno-7-16"> 16</a></span>
+<span class="normal"><a href="#__codelineno-7-17"> 17</a></span>
+<span class="normal"><a href="#__codelineno-7-18"> 18</a></span>
+<span class="normal"><a href="#__codelineno-7-19"> 19</a></span>
+<span class="normal"><a href="#__codelineno-7-20"> 20</a></span>
+<span class="normal"><a href="#__codelineno-7-21"> 21</a></span>
+<span class="normal"><a href="#__codelineno-7-22"> 22</a></span>
+<span class="normal"><a href="#__codelineno-7-23"> 23</a></span>
+<span class="normal"><a href="#__codelineno-7-24"> 24</a></span>
+<span class="normal"><a href="#__codelineno-7-25"> 25</a></span>
+<span class="normal"><a href="#__codelineno-7-26"> 26</a></span>
+<span class="normal"><a href="#__codelineno-7-27"> 27</a></span>
+<span class="normal"><a href="#__codelineno-7-28"> 28</a></span>
+<span class="normal"><a href="#__codelineno-7-29"> 29</a></span>
+<span class="normal"><a href="#__codelineno-7-30"> 30</a></span>
+<span class="normal"><a href="#__codelineno-7-31"> 31</a></span>
+<span class="normal"><a href="#__codelineno-7-32"> 32</a></span>
+<span class="normal"><a href="#__codelineno-7-33"> 33</a></span>
+<span class="normal"><a href="#__codelineno-7-34"> 34</a></span>
+<span class="normal"><a href="#__codelineno-7-35"> 35</a></span>
+<span class="normal"><a href="#__codelineno-7-36"> 36</a></span>
+<span class="normal"><a href="#__codelineno-7-37"> 37</a></span>
+<span class="normal"><a href="#__codelineno-7-38"> 38</a></span>
+<span class="normal"><a href="#__codelineno-7-39"> 39</a></span>
+<span class="normal"><a href="#__codelineno-7-40"> 40</a></span>
+<span class="normal"><a href="#__codelineno-7-41"> 41</a></span>
+<span class="normal"><a href="#__codelineno-7-42"> 42</a></span>
+<span class="normal"><a href="#__codelineno-7-43"> 43</a></span>
+<span class="normal"><a href="#__codelineno-7-44"> 44</a></span>
+<span class="normal"><a href="#__codelineno-7-45"> 45</a></span>
+<span class="normal"><a href="#__codelineno-7-46"> 46</a></span>
+<span class="normal"><a href="#__codelineno-7-47"> 47</a></span>
+<span class="normal"><a href="#__codelineno-7-48"> 48</a></span>
+<span class="normal"><a href="#__codelineno-7-49"> 49</a></span>
+<span class="normal"><a href="#__codelineno-7-50"> 50</a></span>
+<span class="normal"><a href="#__codelineno-7-51"> 51</a></span>
+<span class="normal"><a href="#__codelineno-7-52"> 52</a></span>
+<span class="normal"><a href="#__codelineno-7-53"> 53</a></span>
+<span class="normal"><a href="#__codelineno-7-54"> 54</a></span>
+<span class="normal"><a href="#__codelineno-7-55"> 55</a></span>
+<span class="normal"><a href="#__codelineno-7-56"> 56</a></span>
+<span class="normal"><a href="#__codelineno-7-57"> 57</a></span>
+<span class="normal"><a href="#__codelineno-7-58"> 58</a></span>
+<span class="normal"><a href="#__codelineno-7-59"> 59</a></span>
+<span class="normal"><a href="#__codelineno-7-60"> 60</a></span>
+<span class="normal"><a href="#__codelineno-7-61"> 61</a></span>
+<span class="normal"><a href="#__codelineno-7-62"> 62</a></span>
+<span class="normal"><a href="#__codelineno-7-63"> 63</a></span>
+<span class="normal"><a href="#__codelineno-7-64"> 64</a></span>
+<span class="normal"><a href="#__codelineno-7-65"> 65</a></span>
+<span class="normal"><a href="#__codelineno-7-66"> 66</a></span>
+<span class="normal"><a href="#__codelineno-7-67"> 67</a></span>
+<span class="normal"><a href="#__codelineno-7-68"> 68</a></span>
+<span class="normal"><a href="#__codelineno-7-69"> 69</a></span>
+<span class="normal"><a href="#__codelineno-7-70"> 70</a></span>
+<span class="normal"><a href="#__codelineno-7-71"> 71</a></span>
+<span class="normal"><a href="#__codelineno-7-72"> 72</a></span>
+<span class="normal"><a href="#__codelineno-7-73"> 73</a></span>
+<span class="normal"><a href="#__codelineno-7-74"> 74</a></span>
+<span class="normal"><a href="#__codelineno-7-75"> 75</a></span>
+<span class="normal"><a href="#__codelineno-7-76"> 76</a></span>
+<span class="normal"><a href="#__codelineno-7-77"> 77</a></span>
+<span class="normal"><a href="#__codelineno-7-78"> 78</a></span>
+<span class="normal"><a href="#__codelineno-7-79"> 79</a></span>
+<span class="normal"><a href="#__codelineno-7-80"> 80</a></span>
+<span class="normal"><a href="#__codelineno-7-81"> 81</a></span>
+<span class="normal"><a href="#__codelineno-7-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-7-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-7-84"> 84</a></span>
+<span class="normal"><a href="#__codelineno-7-85"> 85</a></span>
+<span class="normal"><a href="#__codelineno-7-86"> 86</a></span>
+<span class="normal"><a href="#__codelineno-7-87"> 87</a></span>
+<span class="normal"><a href="#__codelineno-7-88"> 88</a></span>
+<span class="normal"><a href="#__codelineno-7-89"> 89</a></span>
+<span class="normal"><a href="#__codelineno-7-90"> 90</a></span>
+<span class="normal"><a href="#__codelineno-7-91"> 91</a></span>
+<span class="normal"><a href="#__codelineno-7-92"> 92</a></span>
+<span class="normal"><a href="#__codelineno-7-93"> 93</a></span>
+<span class="normal"><a href="#__codelineno-7-94"> 94</a></span>
+<span class="normal"><a href="#__codelineno-7-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-7-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-7-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-7-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-7-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-7-100">100</a></span>
+<span class="normal"><a href="#__codelineno-7-101">101</a></span>
+<span class="normal"><a href="#__codelineno-7-102">102</a></span>
+<span class="normal"><a href="#__codelineno-7-103">103</a></span>
+<span class="normal"><a href="#__codelineno-7-104">104</a></span>
+<span class="normal"><a href="#__codelineno-7-105">105</a></span>
+<span class="normal"><a href="#__codelineno-7-106">106</a></span>
+<span class="normal"><a href="#__codelineno-7-107">107</a></span>
+<span class="normal"><a href="#__codelineno-7-108">108</a></span>
+<span class="normal"><a href="#__codelineno-7-109">109</a></span>
+<span class="normal"><a href="#__codelineno-7-110">110</a></span>
+<span class="normal"><a href="#__codelineno-7-111">111</a></span>
+<span class="normal"><a href="#__codelineno-7-112">112</a></span>
+<span class="normal"><a href="#__codelineno-7-113">113</a></span>
+<span class="normal"><a href="#__codelineno-7-114">114</a></span>
+<span class="normal"><a href="#__codelineno-7-115">115</a></span>
+<span class="normal"><a href="#__codelineno-7-116">116</a></span>
+<span class="normal"><a href="#__codelineno-7-117">117</a></span>
+<span class="normal"><a href="#__codelineno-7-118">118</a></span>
+<span class="normal"><a href="#__codelineno-7-119">119</a></span>
+<span class="normal"><a href="#__codelineno-7-120">120</a></span>
+<span class="normal"><a href="#__codelineno-7-121">121</a></span>
+<span class="normal"><a href="#__codelineno-7-122">122</a></span>
+<span class="normal"><a href="#__codelineno-7-123">123</a></span>
+<span class="normal"><a href="#__codelineno-7-124">124</a></span>
+<span class="normal"><a href="#__codelineno-7-125">125</a></span>
+<span class="normal"><a href="#__codelineno-7-126">126</a></span>
+<span class="normal"><a href="#__codelineno-7-127">127</a></span>
+<span class="normal"><a href="#__codelineno-7-128">128</a></span>
+<span class="normal"><a href="#__codelineno-7-129">129</a></span>
+<span class="normal"><a href="#__codelineno-7-130">130</a></span>
+<span class="normal"><a href="#__codelineno-7-131">131</a></span>
+<span class="normal"><a href="#__codelineno-7-132">132</a></span>
+<span class="normal"><a href="#__codelineno-7-133">133</a></span>
+<span class="normal"><a href="#__codelineno-7-134">134</a></span>
+<span class="normal"><a href="#__codelineno-7-135">135</a></span>
+<span class="normal"><a href="#__codelineno-7-136">136</a></span>
+<span class="normal"><a href="#__codelineno-7-137">137</a></span>
+<span class="normal"><a href="#__codelineno-7-138">138</a></span>
+<span class="normal"><a href="#__codelineno-7-139">139</a></span>
+<span class="normal"><a href="#__codelineno-7-140">140</a></span>
+<span class="normal"><a href="#__codelineno-7-141">141</a></span>
+<span class="normal"><a href="#__codelineno-7-142">142</a></span>
+<span class="normal"><a href="#__codelineno-7-143">143</a></span>
+<span class="normal"><a href="#__codelineno-7-144">144</a></span>
+<span class="normal"><a href="#__codelineno-7-145">145</a></span>
+<span class="normal"><a href="#__codelineno-7-146">146</a></span>
+<span class="normal"><a href="#__codelineno-7-147">147</a></span>
+<span class="normal"><a href="#__codelineno-7-148">148</a></span>
+<span class="normal"><a href="#__codelineno-7-149">149</a></span>
+<span class="normal"><a href="#__codelineno-7-150">150</a></span>
+<span class="normal"><a href="#__codelineno-7-151">151</a></span>
+<span class="normal"><a href="#__codelineno-7-152">152</a></span>
+<span class="normal"><a href="#__codelineno-7-153">153</a></span>
+<span class="normal"><a href="#__codelineno-7-154">154</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="k">namespace</span><span class="w"> </span><span class="nn">fuzzer</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="w"> </span><span class="k">final</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5"></a><span class="w">  </span><span class="c1">// This command line flag is used to indicate that the remaining command line</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6"></a><span class="w">  </span><span class="c1">// is immutable, meaning this flag effectively marks the end of the mutable</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7"></a><span class="w">  </span><span class="c1">// argument list.</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8"></a><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">ignoreRemainingArgs</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;-ignore_remaining_args=1&quot;</span><span class="p">;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12"></a><span class="w">  </span><span class="n">Command</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13"></a>
+<a id="__codelineno-7-14" name="__codelineno-7-14"></a><span class="w">  </span><span class="k">explicit</span><span class="w"> </span><span class="n">Command</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ArgsToAdd</span><span class="p">)</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15"></a><span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="n">Args</span><span class="p">(</span><span class="n">ArgsToAdd</span><span class="p">),</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17"></a><span class="w">  </span><span class="k">explicit</span><span class="w"> </span><span class="n">Command</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Other</span><span class="p">)</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18"></a><span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="n">Args</span><span class="p">(</span><span class="n">Other</span><span class="p">.</span><span class="n">Args</span><span class="p">),</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="p">(</span><span class="n">Other</span><span class="p">.</span><span class="n">CombinedOutAndErr</span><span class="p">),</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19"></a><span class="w">        </span><span class="n">OutputFile</span><span class="p">(</span><span class="n">Other</span><span class="p">.</span><span class="n">OutputFile</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20"></a>
+<a id="__codelineno-7-21" name="__codelineno-7-21"></a><span class="w">  </span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22"></a><span class="w">    </span><span class="n">Args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Other</span><span class="p">.</span><span class="n">Args</span><span class="p">;</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23"></a><span class="w">    </span><span class="n">CombinedOutAndErr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Other</span><span class="p">.</span><span class="n">CombinedOutAndErr</span><span class="p">;</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24"></a><span class="w">    </span><span class="n">OutputFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Other</span><span class="p">.</span><span class="n">OutputFile</span><span class="p">;</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="p">;</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27"></a>
+<a id="__codelineno-7-28" name="__codelineno-7-28"></a><span class="w">  </span><span class="o">~</span><span class="n">Command</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29"></a>
+<a id="__codelineno-7-30" name="__codelineno-7-30"></a><span class="w">  </span><span class="c1">// Returns true if the given Arg is present in Args.  Only checks up to</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31"></a><span class="w">  </span><span class="c1">// &quot;-ignore_remaining_args=1&quot;.</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">hasArgument</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Arg</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">();</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">Arg</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-7-35" name="__codelineno-7-35"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-36" name="__codelineno-7-36"></a>
+<a id="__codelineno-7-37" name="__codelineno-7-37"></a><span class="w">  </span><span class="c1">// Gets all of the current command line arguments, **including** those after</span>
+<a id="__codelineno-7-38" name="__codelineno-7-38"></a><span class="w">  </span><span class="c1">// &quot;-ignore-remaining-args=1&quot;.</span>
+<a id="__codelineno-7-39" name="__codelineno-7-39"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">getArguments</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Args</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-40" name="__codelineno-7-40"></a>
+<a id="__codelineno-7-41" name="__codelineno-7-41"></a><span class="w">  </span><span class="c1">// Adds the given argument before &quot;-ignore_remaining_args=1&quot;, or at the end</span>
+<a id="__codelineno-7-42" name="__codelineno-7-42"></a><span class="w">  </span><span class="c1">// if that flag isn&#39;t present.</span>
+<a id="__codelineno-7-43" name="__codelineno-7-43"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">addArgument</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-44" name="__codelineno-7-44"></a><span class="w">    </span><span class="n">Args</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">endMutableArgs</span><span class="p">(),</span><span class="w"> </span><span class="n">Arg</span><span class="p">);</span>
+<a id="__codelineno-7-45" name="__codelineno-7-45"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-46" name="__codelineno-7-46"></a>
+<a id="__codelineno-7-47" name="__codelineno-7-47"></a><span class="w">  </span><span class="c1">// Adds all given arguments before &quot;-ignore_remaining_args=1&quot;, or at the end</span>
+<a id="__codelineno-7-48" name="__codelineno-7-48"></a><span class="w">  </span><span class="c1">// if that flag isn&#39;t present.</span>
+<a id="__codelineno-7-49" name="__codelineno-7-49"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">addArguments</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ArgsToAdd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-50" name="__codelineno-7-50"></a><span class="w">    </span><span class="n">Args</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">endMutableArgs</span><span class="p">(),</span><span class="w"> </span><span class="n">ArgsToAdd</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">ArgsToAdd</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<a id="__codelineno-7-51" name="__codelineno-7-51"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-52" name="__codelineno-7-52"></a>
+<a id="__codelineno-7-53" name="__codelineno-7-53"></a><span class="w">  </span><span class="c1">// Removes the given argument from the command argument list.  Ignores any</span>
+<a id="__codelineno-7-54" name="__codelineno-7-54"></a><span class="w">  </span><span class="c1">// occurrences after &quot;-ignore_remaining_args=1&quot;, if present.</span>
+<a id="__codelineno-7-55" name="__codelineno-7-55"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">removeArgument</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-56" name="__codelineno-7-56"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">();</span>
+<a id="__codelineno-7-57" name="__codelineno-7-57"></a><span class="w">    </span><span class="n">Args</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">remove</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">Arg</span><span class="p">),</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-7-58" name="__codelineno-7-58"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-59" name="__codelineno-7-59"></a>
+<a id="__codelineno-7-60" name="__codelineno-7-60"></a><span class="w">  </span><span class="c1">// Like hasArgument, but checks for &quot;-[Flag]=...&quot;.</span>
+<a id="__codelineno-7-61" name="__codelineno-7-61"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">hasFlag</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Flag</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-62" name="__codelineno-7-62"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">Arg</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Flag</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;=&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-63" name="__codelineno-7-63"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">IsMatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-64" name="__codelineno-7-64"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">compare</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">,</span><span class="w"> </span><span class="n">Other</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">length</span><span class="p">())</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-7-65" name="__codelineno-7-65"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-7-66" name="__codelineno-7-66"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">any_of</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">(),</span><span class="w"> </span><span class="n">IsMatch</span><span class="p">);</span>
+<a id="__codelineno-7-67" name="__codelineno-7-67"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-68" name="__codelineno-7-68"></a>
+<a id="__codelineno-7-69" name="__codelineno-7-69"></a><span class="w">  </span><span class="c1">// Returns the value of the first instance of a given flag, or an empty string</span>
+<a id="__codelineno-7-70" name="__codelineno-7-70"></a><span class="w">  </span><span class="c1">// if the flag isn&#39;t present.  Ignores any occurrences after</span>
+<a id="__codelineno-7-71" name="__codelineno-7-71"></a><span class="w">  </span><span class="c1">// &quot;-ignore_remaining_args=1&quot;, if present.</span>
+<a id="__codelineno-7-72" name="__codelineno-7-72"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">getFlagValue</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Flag</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-73" name="__codelineno-7-73"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">Arg</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Flag</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;=&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-74" name="__codelineno-7-74"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">IsMatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-75" name="__codelineno-7-75"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">compare</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">,</span><span class="w"> </span><span class="n">Other</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">length</span><span class="p">())</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-7-76" name="__codelineno-7-76"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-7-77" name="__codelineno-7-77"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">();</span>
+<a id="__codelineno-7-78" name="__codelineno-7-78"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">find_if</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">IsMatch</span><span class="p">);</span>
+<a id="__codelineno-7-79" name="__codelineno-7-79"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-7-80" name="__codelineno-7-80"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-81" name="__codelineno-7-81"></a><span class="w">      </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="o">-&gt;</span><span class="n">substr</span><span class="p">(</span><span class="n">Arg</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+<a id="__codelineno-7-82" name="__codelineno-7-82"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-83" name="__codelineno-7-83"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-7-84" name="__codelineno-7-84"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-85" name="__codelineno-7-85"></a>
+<a id="__codelineno-7-86" name="__codelineno-7-86"></a><span class="w">  </span><span class="c1">// Like AddArgument, but adds &quot;-[Flag]=[Value]&quot;.</span>
+<a id="__codelineno-7-87" name="__codelineno-7-87"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">addFlag</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Flag</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-88" name="__codelineno-7-88"></a><span class="w">    </span><span class="n">addArgument</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Flag</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Value</span><span class="p">);</span>
+<a id="__codelineno-7-89" name="__codelineno-7-89"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-90" name="__codelineno-7-90"></a>
+<a id="__codelineno-7-91" name="__codelineno-7-91"></a><span class="w">  </span><span class="c1">// Like RemoveArgument, but removes &quot;-[Flag]=...&quot;.</span>
+<a id="__codelineno-7-92" name="__codelineno-7-92"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">removeFlag</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Flag</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-93" name="__codelineno-7-93"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">Arg</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Flag</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;=&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-94" name="__codelineno-7-94"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">IsMatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-95" name="__codelineno-7-95"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">compare</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">,</span><span class="w"> </span><span class="n">Other</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">Arg</span><span class="p">.</span><span class="n">length</span><span class="p">())</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-7-96" name="__codelineno-7-96"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-7-97" name="__codelineno-7-97"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">();</span>
+<a id="__codelineno-7-98" name="__codelineno-7-98"></a><span class="w">    </span><span class="n">Args</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">remove_if</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">IsMatch</span><span class="p">),</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-7-99" name="__codelineno-7-99"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-100" name="__codelineno-7-100"></a>
+<a id="__codelineno-7-101" name="__codelineno-7-101"></a><span class="w">  </span><span class="c1">// Returns whether the command&#39;s stdout is being written to an output file.</span>
+<a id="__codelineno-7-102" name="__codelineno-7-102"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">hasOutputFile</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">OutputFile</span><span class="p">.</span><span class="n">empty</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-103" name="__codelineno-7-103"></a>
+<a id="__codelineno-7-104" name="__codelineno-7-104"></a><span class="w">  </span><span class="c1">// Returns the currently set output file.</span>
+<a id="__codelineno-7-105" name="__codelineno-7-105"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">getOutputFile</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">OutputFile</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-106" name="__codelineno-7-106"></a>
+<a id="__codelineno-7-107" name="__codelineno-7-107"></a><span class="w">  </span><span class="c1">// Configures the command to redirect its output to the name file.</span>
+<a id="__codelineno-7-108" name="__codelineno-7-108"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setOutputFile</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">FileName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">OutputFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileName</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-109" name="__codelineno-7-109"></a>
+<a id="__codelineno-7-110" name="__codelineno-7-110"></a><span class="w">  </span><span class="c1">// Returns whether the command&#39;s stderr is redirected to stdout.</span>
+<a id="__codelineno-7-111" name="__codelineno-7-111"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">isOutAndErrCombined</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-112" name="__codelineno-7-112"></a>
+<a id="__codelineno-7-113" name="__codelineno-7-113"></a><span class="w">  </span><span class="c1">// Sets whether to redirect the command&#39;s stderr to its stdout.</span>
+<a id="__codelineno-7-114" name="__codelineno-7-114"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">combineOutAndErr</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">combine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">combine</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-115" name="__codelineno-7-115"></a>
+<a id="__codelineno-7-116" name="__codelineno-7-116"></a><span class="w">  </span><span class="c1">// Returns a string representation of the command.  On many systems this will</span>
+<a id="__codelineno-7-117" name="__codelineno-7-117"></a><span class="w">  </span><span class="c1">// be the equivalent command line.</span>
+<a id="__codelineno-7-118" name="__codelineno-7-118"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">toString</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-119" name="__codelineno-7-119"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">stringstream</span><span class="w"> </span><span class="n">SS</span><span class="p">;</span>
+<a id="__codelineno-7-120" name="__codelineno-7-120"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">arg</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">getArguments</span><span class="p">())</span>
+<a id="__codelineno-7-121" name="__codelineno-7-121"></a><span class="w">      </span><span class="n">SS</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">arg</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span>
+<a id="__codelineno-7-122" name="__codelineno-7-122"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hasOutputFile</span><span class="p">())</span>
+<a id="__codelineno-7-123" name="__codelineno-7-123"></a><span class="w">      </span><span class="n">SS</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">getOutputFile</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span>
+<a id="__codelineno-7-124" name="__codelineno-7-124"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isOutAndErrCombined</span><span class="p">())</span>
+<a id="__codelineno-7-125" name="__codelineno-7-125"></a><span class="w">      </span><span class="n">SS</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;2&gt;&amp;1 &quot;</span><span class="p">;</span>
+<a id="__codelineno-7-126" name="__codelineno-7-126"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SS</span><span class="p">.</span><span class="n">str</span><span class="p">();</span>
+<a id="__codelineno-7-127" name="__codelineno-7-127"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">result</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+<a id="__codelineno-7-128" name="__codelineno-7-128"></a><span class="w">      </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-7-129" name="__codelineno-7-129"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-7-130" name="__codelineno-7-130"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-131" name="__codelineno-7-131"></a>
+<a id="__codelineno-7-132" name="__codelineno-7-132"></a><span class="k">private</span><span class="o">:</span>
+<a id="__codelineno-7-133" name="__codelineno-7-133"></a><span class="w">  </span><span class="n">Command</span><span class="p">(</span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">delete</span><span class="p">;</span>
+<a id="__codelineno-7-134" name="__codelineno-7-134"></a><span class="w">  </span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">Command</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">Other</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">delete</span><span class="p">;</span>
+<a id="__codelineno-7-135" name="__codelineno-7-135"></a>
+<a id="__codelineno-7-136" name="__codelineno-7-136"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">iterator</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-137" name="__codelineno-7-137"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">Args</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">ignoreRemainingArgs</span><span class="p">());</span>
+<a id="__codelineno-7-138" name="__codelineno-7-138"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-139" name="__codelineno-7-139"></a>
+<a id="__codelineno-7-140" name="__codelineno-7-140"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">const_iterator</span><span class="w"> </span><span class="n">endMutableArgs</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-141" name="__codelineno-7-141"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">Args</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">Args</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">ignoreRemainingArgs</span><span class="p">());</span>
+<a id="__codelineno-7-142" name="__codelineno-7-142"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-143" name="__codelineno-7-143"></a>
+<a id="__codelineno-7-144" name="__codelineno-7-144"></a><span class="w">  </span><span class="c1">// The command arguments.  Args[0] is the command name.</span>
+<a id="__codelineno-7-145" name="__codelineno-7-145"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Args</span><span class="p">;</span>
+<a id="__codelineno-7-146" name="__codelineno-7-146"></a>
+<a id="__codelineno-7-147" name="__codelineno-7-147"></a><span class="w">  </span><span class="c1">// True indicates stderr is redirected to stdout.</span>
+<a id="__codelineno-7-148" name="__codelineno-7-148"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">CombinedOutAndErr</span><span class="p">;</span>
+<a id="__codelineno-7-149" name="__codelineno-7-149"></a>
+<a id="__codelineno-7-150" name="__codelineno-7-150"></a><span class="w">  </span><span class="c1">// If not empty, stdout is redirected to the named file.</span>
+<a id="__codelineno-7-151" name="__codelineno-7-151"></a><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">OutputFile</span><span class="p">;</span>
+<a id="__codelineno-7-152" name="__codelineno-7-152"></a><span class="p">};</span>
+<a id="__codelineno-7-153" name="__codelineno-7-153"></a>
+<a id="__codelineno-7-154" name="__codelineno-7-154"></a><span class="p">}</span><span class="w"> </span><span class="c1">// namespace fuzzer</span>
+</code></pre></div></td></tr></table></div>
+<p>该段代码定义了一个 <code>Command</code> 类，主要用于管理命令行参数和相关操作。以下是逐部分分析：</p>
+<h3 id="command">Command类定义<a class="headerlink" href="#command" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>class Command final</code></strong>: 定义了一个不可继承的 <code>Command</code> 类。</li>
+</ul>
+<h3 id="_3">公共成员<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>静态方法</strong>:<ul>
+<li><code>static inline const char *ignoreRemainingArgs()</code>: 返回一个字符串，表示命令行参数的结束标志。</li>
+</ul>
+</li>
+<li><strong>构造函数</strong>:<ul>
+<li><code>Command()</code>: 默认构造函数，初始化 <code>CombinedOutAndErr</code> 为 <code>false</code>。</li>
+<li><code>explicit Command(const std::vector&lt;std::string&gt; &amp;ArgsToAdd)</code>: 接受参数列表并初始化。</li>
+<li><code>explicit Command(const Command &amp;Other)</code>: 拷贝构造函数，复制其他 <code>Command</code> 对象的成员。</li>
+</ul>
+</li>
+<li><strong>赋值运算符</strong>:<ul>
+<li><code>Command &amp;operator=(const Command &amp;Other)</code>: 赋值运算符重载，复制成员并返回当前对象的引用。</li>
+</ul>
+</li>
+<li><strong>析构函数</strong>:<ul>
+<li><code>~Command()</code>: 默认析构函数。</li>
+</ul>
+</li>
+</ul>
+<h3 id="_4">成员函数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>参数管理</strong>:</p>
+<ul>
+<li><code>bool hasArgument(const std::string &amp;Arg)</code>: 检查给定参数是否存在。</li>
+<li><code>const std::vector&lt;std::string&gt; &amp;getArguments() const</code>: 获取当前所有命令行参数。</li>
+<li><code>void addArgument(const std::string &amp;Arg)</code>: 在标志前添加参数。</li>
+<li><code>void addArguments(const std::vector&lt;std::string&gt; &amp;ArgsToAdd)</code>: 批量添加参数。</li>
+<li><code>void removeArgument(const std::string &amp;Arg)</code>: 移除指定参数。</li>
+</ul>
+</li>
+<li>
+<p><strong>标志管理</strong>:</p>
+<ul>
+<li><code>bool hasFlag(const std::string &amp;Flag)</code>: 检查给定标志是否存在。</li>
+<li><code>std::string getFlagValue(const std::string &amp;Flag)</code>: 获取标志的值。</li>
+<li><code>void addFlag(const std::string &amp;Flag, const std::string &amp;Value)</code>: 添加带值的标志。</li>
+<li><code>void removeFlag(const std::string &amp;Flag)</code>: 移除带值的标志。</li>
+</ul>
+</li>
+<li>
+<p><strong>输出管理</strong>:</p>
+<ul>
+<li><code>bool hasOutputFile() const</code>: 检查是否有输出文件。</li>
+<li><code>const std::string &amp;getOutputFile() const</code>: 获取当前输出文件名。</li>
+<li><code>void setOutputFile(const std::string &amp;FileName)</code>: 设置输出文件名。</li>
+<li><code>bool isOutAndErrCombined() const</code>: 检查标准错误是否与标准输出合并。</li>
+<li><code>void combineOutAndErr(bool combine = true)</code>: 设置标准错误与标准输出的合并状态。</li>
+</ul>
+</li>
+<li>
+<p><strong>字符串表示</strong>:</p>
+<ul>
+<li><code>std::string toString() const</code>: 返回命令的字符串表示，通常是命令行格式。</li>
+</ul>
+</li>
+</ul>
+<h3 id="_5">私有成员<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>成员变量</strong>:</p>
+<ul>
+<li><code>std::vector&lt;std::string&gt; Args</code>: 存储命令行参数。</li>
+<li><code>bool CombinedOutAndErr</code>: 指示标准错误是否重定向到标准输出。</li>
+<li><code>std::string OutputFile</code>: 存储输出文件名。</li>
+</ul>
+</li>
+<li>
+<p><strong>私有方法</strong>:</p>
+<ul>
+<li><code>std::vector&lt;std::string&gt;::iterator endMutableArgs()</code>: 返回可变参数的结束迭代器。</li>
+<li><code>std::vector&lt;std::string&gt;::const_iterator endMutableArgs() const</code>: 返回可变参数的结束常量迭代器。</li>
+</ul>
+</li>
+</ul>
+<h2 id="fuzzerioh">FuzzerIO.h<a class="headerlink" href="#fuzzerioh" title="Permanent link">&para;</a></h2>
+<p><code>FuzzerIO.h</code>文件主要用于定义模糊测试中的输入输出（IO）相关的函数接口。以下是对代码的逐行分析：</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerDefs.h&quot;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li>
+<p><a href="#fuzzerdefsh">FuzzerDefs.h</a>：定义了一些常量和数据结构。</p>
+</li>
+<li>
+<p><strong>函数声明</strong>：</p>
+<ul>
+<li>
+<p><strong>时间和文件处理</strong>（第18-27行）：</p>
+<ul>
+<li><code>GetEpoch</code>：获取指定路径的时间戳。</li>
+<li><code>FileToVector</code>：将文件内容读取到字节向量中。</li>
+<li><code>FileToString</code>：将文件内容读取为字符串。</li>
+<li><code>CopyFileToErr</code>：将文件内容复制到标准错误输出。</li>
+<li><code>WriteToFile</code>：重载函数，用于将数据写入文件。</li>
+</ul>
+</li>
+<li>
+<p><strong>追加和读取文件</strong>（第32-41行）：</p>
+<ul>
+<li><code>AppendToFile</code>：将数据追加到文件。</li>
+<li><code>ReadDirToVectorOfUnits</code>：读取目录中的文件并存储到单位向量中。</li>
+</ul>
+</li>
+<li>
+<p><strong>路径处理</strong>（第39-48行）：</p>
+<ul>
+<li><code>DirPlusFile</code>：返回目录和文件名的组合路径。</li>
+<li><code>DirName</code>：获取文件名的目录部分。</li>
+<li><code>TmpDir</code>：获取临时目录路径。</li>
+<li><code>TempPath</code>：生成临时文件路径。</li>
+</ul>
+</li>
+<li>
+<p><strong>文件特性检查</strong>（第51-53行）：</p>
+<ul>
+<li><code>IsInterestingCoverageFile</code>：检查文件是否为有趣的覆盖文件。</li>
+</ul>
+</li>
+<li>
+<p><strong>标准输出和错误处理</strong>（第53-66行）：</p>
+<ul>
+<li><code>DupAndCloseStderr</code>：复制并关闭标准错误输出。</li>
+<li><code>CloseStdout</code>：关闭标准输出。</li>
+</ul>
+</li>
+<li>
+<p><strong>输出文件管理</strong>（第58-59行）：</p>
+<ul>
+<li><code>GetOutputFile</code>和<code>SetOutputFile</code>：获取和设置输出文件。</li>
+</ul>
+</li>
+<li>
+<p><strong>打印函数</strong>（第61-66行）：</p>
+<ul>
+<li><code>Puts</code>、<code>Printf</code>、<code>VPrintf</code>：用于输出字符串和格式化输出。</li>
+</ul>
+</li>
+<li>
+<p><strong>平台特定函数</strong>（第68-72行）：</p>
+<ul>
+<li><code>IsFile</code>、<code>IsDirectory</code>、<code>FileSize</code>：检查路径是否为文件或目录，并获取文件大小。</li>
+</ul>
+</li>
+<li>
+<p><strong>目录操作</strong>（第73-85行）：</p>
+<ul>
+<li><code>ListFilesInDirRecursive</code>：递归列出目录中的文件。</li>
+<li><code>MkDirRecursive</code>和<code>RmDirRecursive</code>：递归创建和删除目录。</li>
+<li><code>IterateDirRecursive</code>：递归遍历目录，执行回调函数。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>结构体定义</strong>（第87-90行）：</p>
+<ul>
+<li><code>SizedFile</code>：包含文件名和大小，并重载小于运算符。</li>
+</ul>
+</li>
+<li>
+<p><strong>文件处理函数</strong>（第93-112行）：</p>
+<ul>
+<li><code>GetSizedFilesFromDir</code>：获取目录中所有文件及其大小。</li>
+<li><code>OpenFile</code>、<code>CloseFile</code>、<code>DuplicateFile</code>、<code>RemoveFile</code>、<code>RenameFile</code>等函数用于文件的打开、关闭、复制、删除和重命名。</li>
+</ul>
+</li>
+</ul>
+<h2 id="fuzzerdefsh">FuzzerDefs.h<a class="headerlink" href="#fuzzerdefsh" title="Permanent link">&para;</a></h2>
+<p><code>FuzzerDefs.h</code>文件主要用于定义模糊测试中的基本数据结构和函数接口。
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1">1</a></span>
+<span class="normal"><a href="#__codelineno-9-2">2</a></span>
+<span class="normal"><a href="#__codelineno-9-3">3</a></span>
+<span class="normal"><a href="#__codelineno-9-4">4</a></span>
+<span class="normal"><a href="#__codelineno-9-5">5</a></span>
+<span class="normal"><a href="#__codelineno-9-6">6</a></span>
+<span class="normal"><a href="#__codelineno-9-7">7</a></span>
+<span class="normal"><a href="#__codelineno-9-8">8</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cassert&gt;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstddef&gt;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdint&gt;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;set&gt;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+</code></pre></div></td></tr></table></div></p>
+<ul>
+<li><code>cassert</code>：定义了一些宏，用于在程序中插入调试断言。</li>
+<li><code>cstddef</code>：定义了一些与C标准库相关的宏。</li>
+<li><code>cstdint</code>：定义了一些标准的整数类型，如 <code>int8_t</code>、<code>int16_t</code>、<code>int32_t</code>、<code>int64_t</code>、<code>uint8_t</code>、<code>uint16_t</code>、<code>uint32_t</code>、<code>uint64_t</code> 等。</li>
+<li><code>cstring</code>：定义了一些与C标准库相关的宏。</li>
+<li><code>memory</code>：定义了一些与内存操作相关的函数。</li>
+<li><code>set</code>：定义了一些与集合操作相关的函数。</li>
+<li><code>string</code>：定义了一些与字符串操作相关的函数。</li>
+<li><code>vector</code>：定义了一些与向量操作相关的函数。</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span>
+<span class="normal"><a href="#__codelineno-10-2">2</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">Min</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">Max</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>模板函数</strong>：<ul>
+<li><code>Min</code>函数：返回两个值中的较小者。</li>
+<li><code>Max</code>函数：返回两个值中的较大者。</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-11-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-11-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-11-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-11-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-11-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-11-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-11-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-11-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-11-10">10</a></span>
+<span class="normal"><a href="#__codelineno-11-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Random</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dictionary</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">DictionaryEntry</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">MutationDispatcher</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5"></a><span class="k">struct</span><span class="w"> </span><span class="nc">FuzzingOptions</span><span class="p">;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">InputCorpus</span><span class="p">;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="k">struct</span><span class="w"> </span><span class="nc">InputInfo</span><span class="p">;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">ExternalFunctions</span><span class="p">;</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="c1">// Global interface to functions that may or may not be available.</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11"></a><span class="k">extern</span><span class="w"> </span><span class="n">ExternalFunctions</span><span class="w"> </span><span class="o">*</span><span class="n">EF</span><span class="p">;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>类和结构的前向声明</strong>：声明了多个类和结构</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span>
+<span class="normal"><a href="#__codelineno-12-2">2</a></span>
+<span class="normal"><a href="#__codelineno-12-3">3</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="k">typedef</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Unit</span><span class="p">;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2"></a><span class="k">typedef</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Unit</span><span class="o">&gt;</span><span class="w"> </span><span class="n">UnitVector</span><span class="p">;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3"></a><span class="k">typedef</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">UserCallback</span><span class="p">)(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">Data</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">Size</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>类型定义</strong>：<ul>
+<li><code>Unit</code>：定义为<code>std::vector&lt;uint8_t&gt;</code>，表示一个字节数组。</li>
+<li><code>UnitVector</code>：定义为<code>std::vector&lt;Unit&gt;</code>，表示多个字节数组的集合。</li>
+<li><code>UserCallback</code>：定义为一个函数指针类型，接受字节数据和大小作为参数。</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span>
+<span class="normal"><a href="#__codelineno-13-2">2</a></span>
+<span class="normal"><a href="#__codelineno-13-3">3</a></span>
+<span class="normal"><a href="#__codelineno-13-4">4</a></span>
+<span class="normal"><a href="#__codelineno-13-5">5</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">FuzzerDriver</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">***</span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="n">UserCallback</span><span class="w"> </span><span class="n">Callback</span><span class="p">);</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3"></a><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="nf">ExtraCountersBegin</span><span class="p">();</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4"></a><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="nf">ExtraCountersEnd</span><span class="p">();</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5"></a><span class="kt">void</span><span class="w"> </span><span class="nf">ClearExtraCounters</span><span class="p">();</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>函数声明</strong>：<ul>
+<li><code>FuzzerDriver</code>：主驱动函数，接受命令行参数和用户回调函数。</li>
+<li><code>ExtraCountersBegin</code>和<code>ExtraCountersEnd</code>：用于获取额外计数器的起始和结束地址。</li>
+<li><code>ClearExtraCounters</code>：清除额外计数器的函数。</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="k">extern</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">RunningUserCallback</span><span class="p">;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>全局变量</strong>：声明了一个外部布尔变量<code>RunningUserCallback</code>，可能用于指示用户回调是否正在运行。</li>
+</ul>
+<h2 id="fuzzerutilh">FuzzerUtil.h<a class="headerlink" href="#fuzzerutilh" title="Permanent link">&para;</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-15-1">1</a></span>
+<span class="normal"><a href="#__codelineno-15-2">2</a></span>
+<span class="normal"><a href="#__codelineno-15-3">3</a></span>
+<span class="normal"><a href="#__codelineno-15-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerBuiltins.h&quot;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerBuiltinsMsvc.h&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerCommand.h&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;FuzzerDefs.h&quot;</span>
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><a href="#fuzzerbuiltinsh">FuzzerBuiltins.h</a>：定义了一些包装函数和宏。</li>
+<li><a href="#fuzzerbuiltinsmsvch">FuzzerBuiltinsMsvc.h</a>：在MSVC编译器下提供一些内置函数的替代实现。</li>
+<li><a href="#fuzzercommandh">FuzzerCommand.h</a>：定义了一些命令行参数相关的函数。</li>
+<li><a href="#fuzzerdefsh">FuzzerDefs.h</a>：定义了一些常量和数据结构。</li>
+</ul>
+<p><strong>函数定义</strong>：</p>
+<ul>
+<li><code>PrintHexArray</code>和<code>PrintASCII</code>：用于打印十六进制数组和ASCII字符。</li>
+<li><code>ToASCII</code>和<code>IsASCII</code>：用于检查和转换数据为ASCII格式。</li>
+<li><code>Base64</code>：将数据编码为Base64格式。</li>
+<li><code>PrintPC</code>和<code>DescribePC</code>：用于打印程序计数器信息。</li>
+<li><code>ExecuteCommand</code>：执行命令并可获取输出。</li>
+<li><code>CloneArgsWithoutX</code>：克隆参数，排除特定值。</li>
+<li><code>SimpleFastHash</code>：计算数据的快速哈希值。</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-16-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-16-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-16-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-16-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-16-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-16-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-16-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-16-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-16-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-16-10">10</a></span>
+<span class="normal"><a href="#__codelineno-16-11">11</a></span>
+<span class="normal"><a href="#__codelineno-16-12">12</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="nf">RoundUpByPage</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">P</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2"></a><span class="w">  </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">P</span><span class="p">);</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3"></a><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">Mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PageSize</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4"></a><span class="w">  </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">X</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Mask</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">~</span><span class="n">Mask</span><span class="p">;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*&gt;</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6"></a><span class="p">}</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="nf">RoundDownByPage</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">P</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8"></a><span class="w">  </span><span class="kt">uintptr_t</span><span class="w"> </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">P</span><span class="p">);</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9"></a><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">Mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PageSize</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10"></a><span class="w">  </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">~</span><span class="n">Mask</span><span class="p">;</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*&gt;</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12"></a><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>内存管理</strong>：</p>
+<p>提供了与内存相关的函数，如<code>RoundUpByPage</code>和<code>RoundDownByPage</code>，用于按页面大小对齐指针。</p>
+<p><strong>平台特定功能</strong></p>
+<ul>
+<li><code>SetSignalHandler</code>：设置信号处理程序，处理模糊测试中的特定信号。</li>
+<li><code>SleepSeconds</code>：使线程暂停指定的秒数。</li>
+<li><code>GetPid</code>：获取当前进程的ID。</li>
+<li><code>GetPeakRSSMb</code>：获取当前进程的峰值常驻集大小（RSS）。</li>
+<li><code>ExecuteCommand</code>：执行命令并可获取输出。</li>
+<li><code>OpenProcessPipe</code>：打开进程管道以执行命令。</li>
+<li><code>CloseProcessPipe</code>：关闭打开的进程管道。</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">C++</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-17-1">1</a></span>
+<span class="normal"><a href="#__codelineno-17-2">2</a></span>
+<span class="normal"><a href="#__codelineno-17-3">3</a></span>
+<span class="normal"><a href="#__codelineno-17-4">4</a></span>
+<span class="normal"><a href="#__codelineno-17-5">5</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1"></a><span class="cp">#if __BYTE_ORDER == __LITTLE_ENDIAN</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">HostToLE</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">X</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3"></a><span class="cp">#else</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4"></a><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">HostToLE</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Bswap</span><span class="p">(</span><span class="n">X</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="cp">#endif</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>字节序转换</strong>：</p>
+<p>根据字节序定义了<code>HostToLE</code>模板函数。</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BBijon-exploring-deep-state-spaces-via-fuzzing-%E6%9B%B4%E6%96%B0%E4%B8%AD/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 论文精读：IJON: Exploring Deep State Spaces via Fuzzing （更新中）">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                论文精读：IJON: Exploring Deep State Spaces via Fuzzing （更新中）
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../19/%E8%AE%B0%E7%AC%AC%E4%BA%8C%E6%AC%A1%E8%AE%BA%E6%96%87%E7%A0%94%E8%AE%A8/" class="md-footer__link md-footer__link--next" aria-label="Next: 记第二次论文研讨">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                记第二次论文研讨
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Jiuhao
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/jiuhao47" target="_blank" rel="noopener" title="My Github Profile" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexs", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../../../../assets/javascripts/workers/search.6ce7567c.min.js", "tags": {"CSS": "css", "HTML5": "html", "JavaScript": "js", "tag1": "tag_identifier"}, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+        <script src="../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../../../../javascripts/katex.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>
