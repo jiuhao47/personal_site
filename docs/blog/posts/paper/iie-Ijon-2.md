@@ -137,3 +137,33 @@ tags:
 - IJON中使用的注释目前是手动添加的。**设计方法自动推断只针对困难的单个约束是有趣的**。一些现有的fuzzing方法使用我们描述的注释的子集。然而，所有这些工具都不加区别地使用额外的反馈。因此，它们受限于低信息增益反馈机制。
 
 - 最后，现在，注释需要源访问。原则上，没有理由为仅二进制目标实现类似的注释。将IJON与仅二进制fuzzer集成将是有趣的。
+
+
+### 讨论
+
+#### Fuzzer
+
+Fuzzer的输入为数据输入（种子）和程序，然后Fuzzer程序会对数据输入（种子）进行变异，然后运行程序，观察程序的行为，然后根据程序的行为来选择数据输入（种子），以此来达到更好的覆盖率。
+
+在这个过程中Fuzzer维护位图数据结构（65535大小）来记录程序的状态（通过插桩统计），以此来选择更好的数据输入（种子）、淘汰差的数据输入（种子）。
+
+#### 变异策略
+
+变异策略是Fuzzer的核心，Fuzzer的变异策略决定了Fuzzer的性能。
+
+Fuzzer选择初始种子 -> 运行 -> 根据位图选择更好的种子 -> 变异 -> 运行 -> 根据位图选择更好的种子 -> 变异 -> 运行 -> ... 
+
+#### Fuzzing模式
+
+现在的Fuzzing模式是对整个程序进行Fuzzing，因为函数之间的依赖无法解决（上下文关系），所以即使对单个函数Fuzzing完全，也无法证明整体的安全。
+
+### 任务
+
+- 修改Libfuzzer源码，Libfuzzer.a文件->clang的库，名字一致，然后重新编译测试程序，跑起来；
+- 源码阅读：梳理Libfuzzer源码 Runone到ExecuteCallback的路径
+- 测试程序，if (input == "FUZZZZZME"){bug()}
+- 论文精读：AFL Feedback: Coverage-based Greybox Fuzzing as Markov Chain 
+- 论文精度：NEZHA: Efficient Domain-Independent Differential Testing
+
+
+
