@@ -149,6 +149,9 @@
   }
 
   .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     width: max-content;
     font-size: 1.1rem;
     font-weight: 600;
@@ -158,6 +161,12 @@
   .wordmark span {
     color: var(--accent);
     font-style: italic;
+  }
+
+  .wordmark img {
+    display: block;
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   .site-nav {
