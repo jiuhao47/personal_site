@@ -1,5 +1,8 @@
 ---
 import avatar from "../assets/avatar.jpg";
+import Icon from "./Icon.astro";
+
+const email = "jiangjunyan20040728@gmail.com";
 ---
 
 <aside class="profile" aria-label="Personal profile">
@@ -20,12 +23,34 @@ import avatar from "../assets/avatar.jpg";
   </div>
 
   <nav class="profile-links" aria-label="Contact links">
-    <a href="mailto:jiangjunyan20040728@gmail.com">Email <span aria-hidden="true">↗</span></a>
-    <a href="https://github.com/jiuhao47" rel="me">GitHub <span aria-hidden="true">↗</span></a>
+    <div class="profile-link email-row">
+      <span class="link-content">
+        <Icon name="mail" size={14} />
+        <span>Email</span>
+      </span>
+      <button
+        class="copy-button"
+        type="button"
+        data-copy-email={email}
+        aria-label={`Copy email address ${email}`}
+        title="Copy email address"
+      >
+        <span data-copy-label>Copy</span>
+        <span class="copy-state" aria-hidden="true">
+          <span class="copy-default"><Icon name="copy" size={13} /></span>
+          <span class="copy-success"><Icon name="check" size={13} /></span>
+        </span>
+        <span class="sr-only" data-copy-feedback aria-live="polite">Copy email address</span>
+      </button>
+    </div>
+    <a class="profile-link" href="https://github.com/jiuhao47" rel="me">
+      <span class="link-content"><Icon name="repository" size={14} /> GitHub</span>
+      <Icon name="external" size={13} />
+    </a>
   </nav>
 
   <div class="availability">
-    <span class="availability-dot" aria-hidden="true"></span>
+    <Icon name="nodes" size={14} />
     <p>Open to research collaboration</p>
   </div>
 </aside>

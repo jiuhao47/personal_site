@@ -60,6 +60,30 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         updateControls();
       });
 
+      const copyEmailButton = document.querySelector("[data-copy-email]");
+      let copyResetTimer;
+      copyEmailButton?.addEventListener("click", async () => {
+        const email = copyEmailButton.getAttribute("data-copy-email");
+        const feedback = copyEmailButton.querySelector("[data-copy-feedback]");
+        const label = copyEmailButton.querySelector("[data-copy-label]");
+        if (!email) return;
+
+        try {
+          await navigator.clipboard.writeText(email);
+          copyEmailButton.classList.add("is-copied");
+          if (label) label.textContent = "Copied";
+          if (feedback) feedback.textContent = "Email address copied";
+          window.clearTimeout(copyResetTimer);
+          copyResetTimer = window.setTimeout(() => {
+            copyEmailButton.classList.remove("is-copied");
+            if (label) label.textContent = "Copy";
+            if (feedback) feedback.textContent = "Copy email address";
+          }, 1800);
+        } catch {
+          if (feedback) feedback.textContent = "Unable to copy email address";
+        }
+      });
+
       const navLinks = [...document.querySelectorAll(".site-nav a")];
       const sections = [...document.querySelectorAll("main section[id]")];
       const observer = new IntersectionObserver(
