@@ -24,5 +24,5 @@ in the visitor's browser.
 
 ## Deployment
 
-Push to `main` to run the GitHub Pages workflow. In the repository settings, set
-**Pages → Build and deployment → Source** to **GitHub Actions**.
+Push to `main` to run the GitHub Pages workflow. The generated site is published to
+the existing `gh-pages` branch.
