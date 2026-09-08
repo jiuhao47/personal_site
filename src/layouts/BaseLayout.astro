@@ -1,0 +1,82 @@
+---
+import "@fontsource/stix-two-text/latin-400.css";
+import "@fontsource/stix-two-text/latin-400-italic.css";
+import "@fontsource/stix-two-text/latin-600.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" data-mode="system">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f2eb" />
+    <meta name="generator" content={Astro.generator} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2212%22 fill=%22%231b3358%22/><text x=%2250%22 y=%2267%22 text-anchor=%22middle%22 font-size=%2254%22 fill=%22white%22 font-family=%22serif%22>J</text></svg>" />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const storedMode = localStorage.getItem("color-mode");
+        if (["system", "light", "dark"].includes(storedMode)) root.dataset.mode = storedMode;
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      const root = document.documentElement;
+      const modeButton = document.querySelector("#mode-toggle");
+      const modeLabel = document.querySelector("#mode-label");
+      const modeOrder = ["system", "light", "dark"];
+
+      const updateControls = () => {
+        const mode = root.dataset.mode || "system";
+        if (modeLabel) modeLabel.textContent = mode[0].toUpperCase() + mode.slice(1);
+        modeButton?.setAttribute("aria-label", `Color mode: ${mode}`);
+      };
+
+      modeButton?.addEventListener("click", () => {
+        const current = root.dataset.mode || "system";
+        const next = modeOrder[(modeOrder.indexOf(current) + 1) % modeOrder.length];
+        root.dataset.mode = next;
+        localStorage.setItem("color-mode", next);
+        updateControls();
+      });
+
+      const navLinks = [...document.querySelectorAll(".site-nav a")];
+      const sections = [...document.querySelectorAll("main section[id]")];
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          navLinks.forEach((link) => {
+            const active = link.getAttribute("href") === `#${visible.target.id}`;
+            link.toggleAttribute("aria-current", active);
+          });
+        },
+        { rootMargin: "-20% 0px -65%", threshold: [0, 0.25, 0.6] }
+      );
+      sections.forEach((section) => observer.observe(section));
+      updateControls();
+    </script>
+  </body>
+</html>

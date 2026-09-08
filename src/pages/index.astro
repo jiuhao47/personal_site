@@ -1,0 +1,147 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProfileSidebar from "../components/ProfileSidebar.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import ThemeControls from "../components/ThemeControls.astro";
+import { education, honors, navigation, news, publications, research } from "../data/site";
+---
+
+<BaseLayout
+  title="Junyan Jiang — Software Security Researcher"
+  description="Junyan Jiang is a cybersecurity researcher working on fuzzing, program analysis, and agent-assisted vulnerability discovery."
+>
+  <header class="site-header">
+    <a class="wordmark" href="#about" aria-label="Junyan Jiang, back to top">
+      <span>J.</span> Jiang
+    </a>
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      {navigation.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <ThemeControls />
+  </header>
+
+  <div class="page-shell">
+    <ProfileSidebar />
+
+    <main>
+      <section class="hero" id="about">
+        <div class="hero-topline">
+          <p>Research note <span>/</span> Beijing, China</p>
+          <p class="folio">No. 2026—09</p>
+        </div>
+        <h1>
+          Software security,<br />
+          <em>examined from within.</em>
+        </h1>
+        <div class="hero-intro">
+          <p>
+            I am a Ph.D. student at the Institute of Information Engineering, Chinese Academy of
+            Sciences. My research explores automated software security analysis, with a focus on
+            {" "}<strong>differential fuzzing</strong>, <strong>program analysis</strong>, and{" "}
+            <strong>agent-assisted vulnerability discovery</strong>.
+          </p>
+        </div>
+        <ul class="focus-list" aria-label="Research interests">
+          <li>Fuzzing</li>
+          <li>Program Analysis</li>
+          <li>Software Security</li>
+          <li>AI for Security</li>
+        </ul>
+      </section>
+
+      <section class="content-section news-section" id="news">
+        <SectionHeading number="01" title="News" id="news-heading" />
+        <div class="timeline">
+          {news.map((item) => (
+            <article class="timeline-item">
+              <time>{item.date}</time>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="content-section" id="research">
+        <SectionHeading number="02" title="Selected Research" id="research-heading" />
+        <div class="research-list">
+          {research.map((item) => (
+            <article class="research-card">
+              <header>
+                <span class="research-id">{item.id}</span>
+                <span class="research-period">{item.period}</span>
+              </header>
+              <h3>{item.title}</h3>
+              <p class="research-context">{item.context}</p>
+              <p>{item.description}</p>
+              <ul class="detail-list">
+                {item.details.map((detail) => <li>{detail}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="content-section" id="publications">
+        <SectionHeading number="03" title="Publications" id="publications-heading" />
+        <div class="publication-list">
+          {publications.map((publication) => (
+            <article class="publication">
+              <div class="publication-meta">
+                <span>{publication.year}</span>
+                <span>{publication.venue}</span>
+              </div>
+              <div>
+                <p class="publication-status">{publication.status}</p>
+                <h3>{publication.title}</h3>
+                <p class="authors">
+                  {publication.authors.map((author, index) => (
+                    <>
+                      <span class:list={{ "self-author": author === "Junyan Jiang" }}>{author}</span>
+                      {index < publication.authors.length - 1 ? ", " : ""}
+                    </>
+                  ))}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="content-section" id="education">
+        <SectionHeading number="04" title="Education" id="education-heading" />
+        <div class="education-list">
+          {education.map((item) => (
+            <article class="education-item">
+              <time>{item.period}</time>
+              <div>
+                <h3>{item.degree}</h3>
+                <p>{item.institution}</p>
+                <p class="education-note">{item.note}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="content-section" id="honors">
+        <SectionHeading number="05" title="Selected Honors" id="honors-heading" />
+        <div class="honors-list">
+          {honors.map((honor) => (
+            <article class="honor-item">
+              <time>{honor.year}</time>
+              <p>{honor.title}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>Junyan Jiang <span>© 2026</span></p>
+        <p>Typeset with care in Beijing.</p>
+        <a href="#about">Back to top ↑</a>
+      </footer>
+    </main>
+  </div>
+</BaseLayout>
